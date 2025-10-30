@@ -8,15 +8,16 @@ import {
   useEffect,
 } from "react";
 import { Graphics as GraphicsType } from "pixi.js";
-import { ReelsContainer } from "./ReelsContainer";
-import { SlotMachineService } from "../../controllers/slotMachineService";
 import { GAME_CONFIG } from "../../constants/game";
 import type {
   SlotMachineRef,
   SlotMachineProps,
   SlotMachineState,
 } from "../../types";
-import { useBalanceAnimation, useBorderAnimation } from "../../hooks";
+import { SlotMachineService } from "../../controllers/slotMachineService";
+import { ReelsContainer } from "./ReelsContainer";
+import { useBalanceAnimation } from "../../hooks/useBalanceAnimation";
+import { useBorderAnimation } from "../../hooks/useBorderAnimation";
 
 /**
  * SlotMachineReels component - Main game machine rendering

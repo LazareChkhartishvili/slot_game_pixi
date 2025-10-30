@@ -1,10 +1,11 @@
 import { Container, Graphics, Sprite } from "@pixi/react";
 import { Graphics as GraphicsType, Assets } from "pixi.js";
 import { useCallback, useState, useEffect, useRef } from "react";
-import { SlotSymbol } from "./SlotSymbol";
+
 import { Easing, removeAll, Tween, update } from "@tweenjs/tween.js";
 import { GAME_CONFIG } from "../../constants/game";
 import type { ReelSymbolContainer } from "../../types";
+import { SlotSymbol } from "./SlotSymbol";
 
 /**
  * ReelColumn component - Individual reel with spinning animation

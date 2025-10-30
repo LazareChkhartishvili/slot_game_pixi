@@ -1,7 +1,7 @@
 import { Container } from "@pixi/react";
 import { useCallback, useRef, useEffect } from "react";
-import { ReelColumn } from "./ReelColumn";
 import type { ReelGrid } from "../../types";
+import { ReelColumn } from "./ReelColumn";
 
 export const ReelsContainer = ({
   x,

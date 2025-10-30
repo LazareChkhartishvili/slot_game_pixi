@@ -2,20 +2,21 @@ import { Container, Text } from "@pixi/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { TextStyle } from "pixi.js";
 import { sound } from "@pixi/sound";
-import { SlotMachineReels } from "./SlotMachineReels";
-import { SpinActionButton } from "./SpinActionButton";
-import { AutoSpinButton } from "./AutoSpinButton";
-import { FastSpeedButton } from "./FastSpeedButton";
-import { BalancePanel } from "./BalancePanel";
-import { BetAmountControls } from "./BetAmountControls";
+
 import { GameLogo } from "./GameLogo";
-import { MusicIcon } from "./MusicIcon";
 import { SettingsIcon } from "./SettingsIcon";
 
-import { GAME_CONFIG } from "../../constants/game";
 import type { Size, SlotMachineRef, SlotMachineState } from "../../types";
 import { useLayoutDimensions } from "../../hooks/useLayoutDimensions";
 import { useKeyboardControls } from "../../hooks/useKeyboardControls";
+import { GAME_CONFIG } from "../../constants/game";
+import { SlotMachineReels } from "./SlotMachineReels";
+import { MusicIcon } from "./MusicIcon";
+import { BalancePanel } from "./BalancePanel";
+import { BetAmountControls } from "./BetAmountControls";
+import { FastSpeedButton } from "./FastSpeedButton";
+import { AutoSpinButton } from "./AutoSpinButton";
+import { SpinActionButton } from "./SpinActionButton";
 
 export const SlotGameContainer = ({ width, height }: Size) => {
   const slotMachineRef = useRef<SlotMachineRef>(null);
