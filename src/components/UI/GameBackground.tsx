@@ -25,7 +25,6 @@ export const GameBackground = ({ width, height }: Size) => {
         const texture = await Assets.load("/images/background.jpg");
         setBgTexture(texture);
         setBgLoaded(true);
-        console.log("Background image loaded");
       } catch (error) {
         console.error("Failed to load background image:", error);
         setBgTexture(createGradientTexture(width, height));
