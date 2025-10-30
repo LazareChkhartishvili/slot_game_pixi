@@ -80,78 +80,109 @@ export class SlotMachineService {
 
   /**
    * Calculate win based on current reel positions
+   * Uses standard slot machine logic: paylines from left to right
    */
   private calculateWin(): {
     win: number;
     winningPositions: [number, number][];
   } {
-    // Evaluate only the middle row and pay if 3+ match starting from LEFTMOST or RIGHTMOST
-    const middleRow = this.state.reelPositions
-      .map((reel) => reel[1])
-      .filter((symbol): symbol is number => symbol !== undefined);
-
-    const length = middleRow.length;
-    if (length === 0) {
-      return { win: 0, winningPositions: [] };
-    }
-
-    // Count run from left edge
-    let leftLen = 1;
-    const leftSymbol = middleRow[0] as number;
-    for (let i = 1; i < length; i++) {
-      if (middleRow[i] === leftSymbol) leftLen++;
-      else break;
-    }
-
-    // Count run from right edge
-    let rightLen = 1;
-    const rightSymbol = middleRow[length - 1] as number;
-    for (let i = length - 2; i >= 0; i--) {
-      if (middleRow[i] === rightSymbol) rightLen++;
-      else break;
-    }
-
-    const minMatch = GAME_CONFIG.WIN_CALCULATION.MIN_MATCHES_FOR_WIN;
+    const paytable = GAME_CONFIG.WIN_CALCULATION.PAYTABLE;
+    const minMatches = GAME_CONFIG.WIN_CALCULATION.MIN_MATCHES_FOR_WIN;
     let totalWin = 0;
     const winningPositions: [number, number][] = [];
 
-    const payLeft = leftLen >= minMatch;
-    const payRight = rightLen >= minMatch;
+    // Define paylines: top row (0), middle row (1), bottom row (2)
+    const paylines = [
+      // Top row
+      this.state.reelPositions.map((reel) => reel[0]),
+      // Middle row
+      this.state.reelPositions.map((reel) => reel[1]),
+      // Bottom row
+      this.state.reelPositions.map((reel) => reel[2]),
+    ];
 
-    const overlap =
-      payLeft &&
-      payRight &&
-      leftSymbol === rightSymbol &&
-      leftLen + rightLen > length;
+    // Check each payline
+    paylines.forEach((payline, rowIndex) => {
+      if (payline.length === 0) return;
 
-    if (payLeft) {
-      const len = overlap
-        ? Math.max(leftLen, Math.min(leftLen, length))
-        : leftLen;
-      const multiplier = (leftSymbol + 1) * len;
-      totalWin += this.state.betAmount * multiplier;
-      for (let i = 0; i < len; i++) winningPositions.push([i, 1]);
-    }
+      // Track which individual positions have already been counted as wins
+      const usedPositions = new Set<number>();
 
-    if (payRight) {
-      let len = rightLen;
-      let start = length - rightLen;
+      // Function to check and add win
+      const addWin = (
+        symbol: number,
+        matchCount: number,
+        startCol: number
+      ) => {
+        if (matchCount < minMatches) return;
 
-      if (overlap) {
-        if (leftLen >= length) {
-          len = 0;
+        // Check if any position in this range is already used
+        let hasOverlap = false;
+        for (let i = startCol; i < startCol + matchCount; i++) {
+          if (usedPositions.has(i)) {
+            hasOverlap = true;
+            break;
+          }
+        }
+        if (hasOverlap) return;
+
+        const symbolMultipliers = paytable[symbol];
+        const multiplierIndex = Math.min(
+          matchCount - minMatches,
+          symbolMultipliers.length - 1
+        );
+        const multiplier = symbolMultipliers[multiplierIndex] || 0;
+
+        if (multiplier > 0) {
+          totalWin += this.state.betAmount * multiplier;
+          
+          // Mark all positions in this win as used
+          for (let i = startCol; i < startCol + matchCount; i++) {
+            usedPositions.add(i);
+            winningPositions.push([i, rowIndex]);
+          }
+        }
+      };
+
+      // Scan from LEFT TO RIGHT
+      let currentSymbol = payline[0];
+      let matchCount = 1;
+      let startColumn = 0;
+
+      for (let col = 1; col < payline.length; col++) {
+        if (payline[col] === currentSymbol) {
+          matchCount++;
         } else {
-          const leftCovered = leftLen;
-          start = Math.max(leftCovered, length - rightLen);
-          len = length - start;
+          addWin(currentSymbol, matchCount, startColumn);
+          // Start new sequence
+          currentSymbol = payline[col];
+          matchCount = 1;
+          startColumn = col;
         }
       }
-      if (len > 0) {
-        const multiplier = (rightSymbol + 1) * len;
-        totalWin += this.state.betAmount * multiplier;
-        for (let i = 0; i < len; i++) winningPositions.push([start + i, 1]);
+      // Check final sequence from left
+      addWin(currentSymbol, matchCount, startColumn);
+
+      // Scan from RIGHT TO LEFT (for sequences that start from the right edge)
+      currentSymbol = payline[payline.length - 1];
+      matchCount = 1;
+      startColumn = payline.length - 1;
+
+      for (let col = payline.length - 2; col >= 0; col--) {
+        if (payline[col] === currentSymbol) {
+          matchCount++;
+          startColumn = col;
+        } else {
+          addWin(currentSymbol, matchCount, startColumn);
+          // Start new sequence
+          currentSymbol = payline[col];
+          matchCount = 1;
+          startColumn = col;
+        }
       }
-    }
+      // Check final sequence from right
+      addWin(currentSymbol, matchCount, startColumn);
+    });
 
     return { win: totalWin, winningPositions };
   }
