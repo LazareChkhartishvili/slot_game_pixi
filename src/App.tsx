@@ -2,23 +2,13 @@ import { Stage } from "@pixi/react";
 import { useStageDimensions } from "./hooks/useStageDimensions";
 import { GameBackground } from "./components/UI";
 import { SlotGameContainer } from "./components/Game/SlotGameContainer";
-import { InputController } from "./controllers/InputController";
-import { useEffect } from "react";
 import { KonamiEffect } from "./components/UI/KonamiEffect";
 import { SettingsOverlay } from "./components/UI/SettingsOverlay";
+import { useKonamiHandler } from "./hooks/useKonamiHandler";
 
 const App = () => {
   const dimensions = useStageDimensions();
-  useEffect(() => {
-    const handler = () => {
-      window.dispatchEvent(
-        new CustomEvent("konamiCode", { detail: { bonus: 1000000 } })
-      );
-    };
-    InputController.addEventListener("konami", handler as EventListener);
-    return () =>
-      InputController.removeEventListener("konami", handler as EventListener);
-  }, []);
+  useKonamiHandler();
   return (
     <>
       <Stage

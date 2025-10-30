@@ -1,5 +1,6 @@
 export { useStageDimensions } from "./useStageDimensions";
 export { useKonamiCode } from "./useKonamiCode";
+export { useKonamiHandler } from "./useKonamiHandler";
 export { useStarfieldAnimation } from "./useStarfieldAnimation";
 export { useExplosionAnimation } from "./useExplosionAnimation";
 export { useKeyboardControls } from "./useKeyboardControls";

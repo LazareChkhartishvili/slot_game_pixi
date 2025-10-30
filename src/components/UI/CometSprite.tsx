@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Sprite } from "@pixi/react";
 import { Texture } from "pixi.js";
-import { useCallback } from "react";
+import { useCallback, memo } from "react";
 import type { Star } from "../../types";
 import type { ExplosionParticle } from "../../types";
 
@@ -11,7 +11,7 @@ interface CometSpriteProps {
   onCometClick: (comet: Star) => ExplosionParticle[];
 }
 
-export const CometSprite = ({
+export const CometSprite = memo(({
   comet,
   texture,
   onCometClick,
@@ -39,4 +39,4 @@ export const CometSprite = ({
       pointerdown={handleClick}
     />
   );
-};
+});

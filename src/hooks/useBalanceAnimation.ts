@@ -9,12 +9,12 @@ export const useBalanceAnimation = (balance: number) => {
     accumulatorRef.current = 0;
     const unsubscribe = AnimationLoop.subscribe((dt) => {
       accumulatorRef.current += dt;
-      if (accumulatorRef.current < 50) return;
+      if (accumulatorRef.current < 16) return;
       accumulatorRef.current = 0;
       setDisplayBalance((prev) => {
         if (prev === balance) return prev;
         const diff = balance - prev;
-        const step = Math.max(0.01, Math.abs(diff) / 20);
+        const step = Math.max(0.01, Math.abs(diff) / 5);
         if (Math.abs(diff) <= step) return balance;
         return diff > 0 ? prev + step : prev - step;
       });
