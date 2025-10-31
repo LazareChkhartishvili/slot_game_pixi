@@ -1,5 +1,5 @@
 import { Container, Sprite } from "@pixi/react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState, memo } from "react";
 import { Assets, Circle } from "pixi.js";
 
 interface SettingsIconProps {
@@ -9,7 +9,7 @@ interface SettingsIconProps {
   onClick: () => void;
 }
 
-export const SettingsIcon = ({
+export const SettingsIcon = memo(({
   x,
   y,
   size = 35,
@@ -18,6 +18,9 @@ export const SettingsIcon = ({
   const [iconLoaded, setIconLoaded] = useState(false);
 
   const iconPath = "/images/symbols/header_info_icon.png";
+
+  // Memoize hitArea to prevent recreation
+  const hitArea = useMemo(() => new Circle(0, 0, size / 2), [size]);
 
   // Load icon
   useEffect(() => {
@@ -48,7 +51,7 @@ export const SettingsIcon = ({
         onClick();
       }}
       interactive={true}
-      hitArea={new Circle(0, 0, size / 2)}
+      hitArea={hitArea}
     >
       <Sprite
         texture={iconTexture}
@@ -58,4 +61,4 @@ export const SettingsIcon = ({
       />
     </Container>
   );
-};
+});

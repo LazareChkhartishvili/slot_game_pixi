@@ -1,5 +1,5 @@
 import { Container, Text } from "@pixi/react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { TextStyle } from "pixi.js";
 import { sound } from "@pixi/sound";
 
@@ -34,10 +34,17 @@ export const SlotGameContainer = ({ width, height }: Size) => {
   const [isAutoSpinning, setIsAutoSpinning] = useState(false);
   const [isFastMode, setIsFastMode] = useState(false);
 
+  const isMusicPlayingRef = useRef(false);
   const isAutoSpinningRef = useRef(false);
   const isFastModeRef = useRef(false);
 
   const layout = useLayoutDimensions({ width, height });
+  const layoutRef = useRef(layout);
+
+  // Update layout ref when layout changes
+  useEffect(() => {
+    layoutRef.current = layout;
+  }, [layout]);
 
   // Initialize PixiJS Sound
   useEffect(() => {
@@ -59,6 +66,10 @@ export const SlotGameContainer = ({ width, height }: Size) => {
   }, []);
 
   // Sync refs with state
+  useEffect(() => {
+    isMusicPlayingRef.current = isMusicPlaying;
+  }, [isMusicPlaying]);
+
   useEffect(() => {
     isAutoSpinningRef.current = isAutoSpinning;
   }, [isAutoSpinning]);
@@ -164,28 +175,29 @@ export const SlotGameContainer = ({ width, height }: Size) => {
 
   const handleOpenModal = useCallback(() => {
     // Open DOM overlay outside the canvas with slot bounds
+    const currentLayout = layoutRef.current;
     window.dispatchEvent(
       new CustomEvent("settingsOpen", {
         detail: {
-          x: layout.slotMachinePosition.x,
-          y: layout.slotMachinePosition.y,
-          width: layout.slotMachineWidth,
-          height: layout.slotMachineHeight,
+          x: currentLayout.slotMachinePosition.x,
+          y: currentLayout.slotMachinePosition.y,
+          width: currentLayout.slotMachineWidth,
+          height: currentLayout.slotMachineHeight,
         },
       })
     );
-  }, [layout]);
+  }, []);
 
   const handleToggleMusic = useCallback(() => {
-    console.log("Music toggle clicked, current state:", isMusicPlaying);
+    const currentState = isMusicPlayingRef.current;
+    const newState = !currentState;
 
-    // Toggle state first
-    const newState = !isMusicPlaying;
+    // Update both state and ref
     setIsMusicPlaying(newState);
+    isMusicPlayingRef.current = newState;
 
     // Control music immediately on click (user interaction)
     if (!sound.exists("background-music")) {
-      console.warn("Background music not loaded yet");
       return;
     }
 
@@ -202,13 +214,13 @@ export const SlotGameContainer = ({ width, height }: Size) => {
           loop: true, // Loop the entire track
         });
       } catch (error) {
-        console.warn("Could not play music:", error);
+        // Silent fail - music is not critical
       }
     } else {
       // Stop the music
       sound.stop("background-music");
     }
-  }, [isMusicPlaying]);
+  }, []);
 
   const handleToggleAutoSpin = useCallback(() => {
     setIsAutoSpinning((prev) => !prev);
@@ -233,15 +245,19 @@ export const SlotGameContainer = ({ width, height }: Size) => {
     betAmount: gameState.betAmount,
   });
 
-  // Style for text below slot machine
-  const textBelowStyle = new TextStyle({
-    fill: 0xffffff,
-    fontSize: 18,
-    fontWeight: "500",
-    fontFamily: "Poppins, sans-serif",
-    align: "center",
-    letterSpacing: 1,
-  });
+  // Style for text below slot machine - memoized to prevent recreation
+  const textBelowStyle = useMemo(
+    () =>
+      new TextStyle({
+        fill: 0xffffff,
+        fontSize: 18,
+        fontWeight: "500",
+        fontFamily: "Poppins, sans-serif",
+        align: "center",
+        letterSpacing: 1,
+      }),
+    []
+  );
 
   return (
     <Container>

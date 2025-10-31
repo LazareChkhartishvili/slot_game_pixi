@@ -1,21 +1,35 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback, memo } from "react";
 
-export const KonamiEffect = () => {
+// Sparkle indices array outside component to prevent recreation
+const SPARKLE_INDICES = Array.from({ length: 20 }, (_, i) => i);
+
+export const KonamiEffect = memo(() => {
   const [showEffect, setShowEffect] = useState(false);
 
-  useEffect(() => {
-    const handleKonamiCode = () => {
-      setShowEffect(true);
-      setTimeout(() => setShowEffect(false), 4000);
-    };
+  const handleKonamiCode = useCallback(() => {
+    setShowEffect(true);
+    setTimeout(() => setShowEffect(false), 4000);
+  }, []);
 
+  useEffect(() => {
     window.addEventListener("konamiCode", handleKonamiCode as EventListener);
     return () =>
       window.removeEventListener(
         "konamiCode",
         handleKonamiCode as EventListener
       );
-  }, []);
+  }, [handleKonamiCode]);
+
+  // Memoize sparkle style calculation
+  const getSparkleStyle = useCallback(
+    (i: number): React.CSSProperties => ({
+      "--delay": `${i * 0.1}s`,
+      "--angle": `${i * 18}deg`,
+      left: "50%",
+      top: "50%",
+    }),
+    []
+  );
 
   if (!showEffect) return null;
 
@@ -26,18 +40,11 @@ export const KonamiEffect = () => {
           <div className="konami-title">KONAMI CODE ACTIVATED!</div>
           <div className="konami-amount">+$1,000,000</div>
           <div className="konami-sparkles">
-            {Array.from({ length: 20 }).map((_, i) => (
+            {SPARKLE_INDICES.map((i) => (
               <div
                 key={i}
                 className="sparkle"
-                style={
-                  {
-                    "--delay": `${i * 0.1}s`,
-                    "--angle": `${i * 18}deg`,
-                    left: "50%",
-                    top: "50%",
-                  } as React.CSSProperties
-                }
+                style={getSparkleStyle(i) as React.CSSProperties}
               />
             ))}
           </div>
@@ -54,7 +61,7 @@ export const KonamiEffect = () => {
           align-items: center;
           justify-content: center;
           pointer-events: none;
-          z-index: 9999;
+          z-index: 10001;
         }
         .konami-message {
           text-align: center;
@@ -152,4 +159,4 @@ export const KonamiEffect = () => {
       `}</style>
     </>
   );
-};
+});

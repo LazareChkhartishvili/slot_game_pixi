@@ -10,3 +10,4 @@ export { SettingsIcon } from "./SettingsIcon";
 export { MusicIcon } from "./MusicIcon";
 export { AutoSpinButton } from "./AutoSpinButton";
 export { FastSpeedButton } from "./FastSpeedButton";
+export { ToggleIconButton } from "./ToggleIconButton";

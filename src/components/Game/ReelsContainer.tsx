@@ -1,5 +1,5 @@
 import { Container } from "@pixi/react";
-import { useCallback, useRef, useEffect } from "react";
+import { useCallback, useRef, useEffect, useMemo } from "react";
 import type { ReelGrid } from "../../types";
 import { ReelColumn } from "./ReelColumn";
 
@@ -17,6 +17,12 @@ export const ReelsContainer = ({
 }: ReelGrid) => {
   const spinningRef = useRef(isSpinning);
   const isStoppingRef = useRef(false);
+
+  // Memoize column indices array to prevent recreation
+  const columnIndices = useMemo(
+    () => Array.from({ length: columns }, (_, i) => i),
+    [columns]
+  );
 
   const generateRandomSymbols = useCallback((count: number) => {
     return Array.from({ length: count * 3 }, () =>
@@ -45,37 +51,35 @@ export const ReelsContainer = ({
 
   return (
     <Container position={[x, y]}>
-      {Array(columns)
-        .fill(0)
-        .map((_, columnIndex) => {
-          // Get the target symbols for this reel
-          const targetPositions: number[] | undefined = reelPositions
-            ? reelPositions[columnIndex]
-            : undefined;
+      {columnIndices.map((columnIndex) => {
+        // Get the target symbols for this reel
+        const targetPositions: number[] | undefined = reelPositions
+          ? reelPositions[columnIndex]
+          : undefined;
 
-          // Find winning positions in this reel
-          const reelWinningPositions = winningPositions.filter(
-            ([colIndex]) => colIndex === columnIndex
-          );
+        // Find winning positions in this reel
+        const reelWinningPositions = winningPositions.filter(
+          ([colIndex]) => colIndex === columnIndex
+        );
 
-          return (
-            <ReelColumn
-              key={`reel-${columnIndex}`}
-              x={columnIndex * cellWidth}
-              y={0}
-              width={cellWidth}
-              height={cellHeight * rows}
-              symbolCount={rows}
-              symbols={initialReelSymbols.current[columnIndex] || []}
-              isSpinning={isSpinning}
-              reelIndex={columnIndex}
-              targetPositions={targetPositions}
-              winningPositions={reelWinningPositions}
-              anyWinningSymbolsInGame={winningPositions.length > 0}
-              fastMode={fastMode}
-            />
-          );
-        })}
+        return (
+          <ReelColumn
+            key={`reel-${columnIndex}`}
+            x={columnIndex * cellWidth}
+            y={0}
+            width={cellWidth}
+            height={cellHeight * rows}
+            symbolCount={rows}
+            symbols={initialReelSymbols.current[columnIndex] || []}
+            isSpinning={isSpinning}
+            reelIndex={columnIndex}
+            targetPositions={targetPositions}
+            winningPositions={reelWinningPositions}
+            anyWinningSymbolsInGame={winningPositions.length > 0}
+            fastMode={fastMode}
+          />
+        );
+      })}
     </Container>
   );
 };

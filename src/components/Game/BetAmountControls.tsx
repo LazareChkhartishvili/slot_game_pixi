@@ -1,9 +1,25 @@
 import { Container, Graphics, Text } from "@pixi/react";
 import { TextStyle, Graphics as GraphicsType } from "pixi.js";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { formatCurrency } from "../../helper/formatCurrency";
 import { GAME_CONFIG } from "../../constants/game";
 import type { BetControlsProps } from "../../types";
+
+// Static styles - created once
+const LABEL_STYLE = new TextStyle({
+  fill: 0xa0a3ff,
+  fontSize: 14,
+  fontWeight: "600",
+  letterSpacing: 1,
+  fontFamily: "Poppins, sans-serif",
+});
+
+const AMOUNT_STYLE = new TextStyle({
+  fill: 0xffffff,
+  fontSize: 20,
+  fontWeight: "700",
+  fontFamily: "Poppins, sans-serif",
+});
 
 export const BetAmountControls = ({
   x,
@@ -82,28 +98,34 @@ export const BetAmountControls = ({
     }
   }, [betAmount, onChangeBet, disabled, getBetStep]);
 
-  const labelStyle = new TextStyle({
-    fill: 0xa0a3ff,
-    fontSize: 14,
-    fontWeight: "600",
-    letterSpacing: 1,
-    fontFamily: "Poppins, sans-serif",
-  });
+  // Memoize symbol styles for each state
+  const symbolStyleEnabled = useMemo(
+    () =>
+      new TextStyle({
+        fill: "7471c4",
+        fontSize: 26,
+        fontWeight: "700",
+        fontFamily: "Poppins, sans-serif",
+      }),
+    []
+  );
 
-  const amountStyle = new TextStyle({
-    fill: 0xffffff,
-    fontSize: 20,
-    fontWeight: "700",
-    fontFamily: "Poppins, sans-serif",
-  });
+  const symbolStyleDisabled = useMemo(
+    () =>
+      new TextStyle({
+        fill: 0x3a3a4e,
+        fontSize: 26,
+        fontWeight: "700",
+        fontFamily: "Poppins, sans-serif",
+      }),
+    []
+  );
 
-  const getSymbolStyle = (isButtonDisabled: boolean) =>
-    new TextStyle({
-      fill: disabled || isButtonDisabled ? 0x3a3a4e : "7471c4",
-      fontSize: 26,
-      fontWeight: "700",
-      fontFamily: "Poppins, sans-serif",
-    });
+  const getSymbolStyle = useCallback(
+    (isButtonDisabled: boolean) =>
+      disabled || isButtonDisabled ? symbolStyleDisabled : symbolStyleEnabled,
+    [disabled, symbolStyleDisabled, symbolStyleEnabled]
+  );
 
   const leftX = -panelWidth / 2 + 24;
   const buttonSpacing = 50;
@@ -120,14 +142,14 @@ export const BetAmountControls = ({
         <Text
           text="BET AMOUNT (USD)"
           anchor={[0, 0]}
-          style={labelStyle}
+          style={LABEL_STYLE}
           alpha={0.7}
         />
         <Text
           text={formatCurrency(betAmount)}
           position={[0, 25]}
           anchor={[0, 0]}
-          style={amountStyle}
+          style={AMOUNT_STYLE}
           alpha={0.7}
         />
       </Container>

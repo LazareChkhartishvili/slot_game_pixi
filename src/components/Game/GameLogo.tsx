@@ -1,5 +1,5 @@
 import { Container, Sprite } from "@pixi/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo } from "react";
 import { Assets } from "pixi.js";
 
 interface GameLogoProps {
@@ -9,7 +9,7 @@ interface GameLogoProps {
   height?: number;
 }
 
-export const GameLogo = ({ x, y, width, height }: GameLogoProps) => {
+export const GameLogo = memo(({ x, y, width, height }: GameLogoProps) => {
   const [logoLoaded, setLogoLoaded] = useState(false);
   const logoPath = "/images/logo.png";
 
@@ -45,4 +45,4 @@ export const GameLogo = ({ x, y, width, height }: GameLogoProps) => {
       />
     </Container>
   );
-};
+});

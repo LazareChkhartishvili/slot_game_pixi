@@ -1,5 +1,5 @@
 import { Container, Sprite } from "@pixi/react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState, memo } from "react";
 import { Assets, Circle } from "pixi.js";
 
 interface MusicIconProps {
@@ -10,7 +10,7 @@ interface MusicIconProps {
   onClick: () => void;
 }
 
-export const MusicIcon = ({
+export const MusicIcon = memo(({
   x,
   y,
   size = 50,
@@ -22,6 +22,9 @@ export const MusicIcon = ({
 
   const soundOnPath = "/images/symbols/sound_on.png";
   const soundOffPath = "/images/symbols/sound_off.png";
+
+  // Memoize hitArea to prevent recreation
+  const hitArea = useMemo(() => new Circle(0, 0, size / 2), [size]);
 
   // Load sound icons
   useEffect(() => {
@@ -56,7 +59,7 @@ export const MusicIcon = ({
         onClick();
       }}
       interactive={true}
-      hitArea={new Circle(0, 0, size / 2)}
+      hitArea={hitArea}
     >
       <Sprite
         texture={currentTexture}
@@ -66,4 +69,4 @@ export const MusicIcon = ({
       />
     </Container>
   );
-};
+});

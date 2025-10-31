@@ -1,54 +1,50 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, memo } from "react";
 
-interface SettingsOverlayPayload {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
+const KEYBOARD_SHORTCUTS = [
+  ["SPACE", "Spin / Play"],
+  ["S", "Open Settings"],
+  ["M", "Toggle Music"],
+  ["F", "Toggle Fast Speed"],
+  ["A", "Toggle Auto Spin"],
+  ["← / →", "Decrease / Increase Bet"],
+] as const;
 
-export const SettingsOverlay = () => {
+export const SettingsOverlay = memo(() => {
   const [open, setOpen] = useState(false);
-  const [bounds, setBounds] = useState<SettingsOverlayPayload | null>(null);
+
+  const handleClose = useCallback(() => setOpen(false), []);
 
   useEffect(() => {
-    const handleOpen = (e: Event) => {
-      const custom = e as CustomEvent<SettingsOverlayPayload>;
-      setBounds(custom.detail || null);
-      setOpen(true);
+    const handleOpen = () => setOpen(true);
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
     };
-    const handleClose = () => setOpen(false);
-    const handleEsc = (e: KeyboardEvent) =>
-      e.key === "Escape" && setOpen(false);
 
-    window.addEventListener("settingsOpen", handleOpen as EventListener);
-    window.addEventListener("settingsClose", handleClose as EventListener);
+    window.addEventListener("settingsOpen", handleOpen);
+    window.addEventListener("settingsClose", handleClose);
     window.addEventListener("keydown", handleEsc);
 
     return () => {
-      window.removeEventListener("settingsOpen", handleOpen as EventListener);
-      window.removeEventListener("settingsClose", handleClose as EventListener);
+      window.removeEventListener("settingsOpen", handleOpen);
+      window.removeEventListener("settingsClose", handleClose);
       window.removeEventListener("keydown", handleEsc);
     };
-  }, []);
+  }, [handleClose]);
 
   if (!open) return null;
 
-  const panelWidth = bounds?.width ?? Math.min(900, window.innerWidth - 40);
-  const panelHeight = bounds?.height ?? Math.min(600, window.innerHeight - 80);
-
   return (
     <div
-      className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn"
-      onClick={() => setOpen(false)}
+      className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-300"
+      onClick={handleClose}
     >
       <div
-        className={`relative flex flex-col text-white rounded-2xl border border-indigo-400/40
+        className="relative flex flex-col text-white rounded-2xl border border-indigo-400/40
         shadow-[0_10px_40px_rgba(0,0,0,0.6),_inset_0_0_30px_rgba(99,102,241,0.25)]
         bg-gradient-to-b from-[#181b30] to-[#0f1122]
         max-w-[calc(100vw-40px)] max-h-[calc(100vh-80px)]
-        overflow-hidden w-[${panelWidth}px] h-[${panelHeight}px]
-        scale-95 opacity-0 animate-popup`}
+        overflow-hidden w-full h-full md:w-[900px] md:h-[600px]
+        animate-in zoom-in-95 duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -57,14 +53,14 @@ export const SettingsOverlay = () => {
             Settings
           </h2>
           <button
-            onClick={() => setOpen(false)}
+            onClick={handleClose}
             className="w-9 h-9 rounded-lg bg-white/10 hover:bg-white/20 transition flex items-center justify-center text-xl"
           >
             ✕
           </button>
 
           {/* subtle moving light */}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-400/10 to-transparent animate-scan" />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-400/10 to-transparent animate-[scan_6s_linear_infinite] mix-blend-screen opacity-20" />
         </div>
 
         {/* Content */}
@@ -75,14 +71,7 @@ export const SettingsOverlay = () => {
               Keyboard Shortcuts
             </h3>
             <ul className="space-y-2">
-              {[
-                ["SPACE", "Spin / Play"],
-                ["S", "Open Settings"],
-                ["M", "Toggle Music"],
-                ["F", "Toggle Fast Speed"],
-                ["A", "Toggle Auto Spin"],
-                ["← / →", "Decrease / Increase Bet"],
-              ].map(([key, desc]) => (
+              {KEYBOARD_SHORTCUTS.map(([key, desc]) => (
                 <li
                   key={key}
                   className="grid grid-cols-[130px_1fr] gap-3 items-center"
@@ -111,32 +100,13 @@ export const SettingsOverlay = () => {
         </div>
       </div>
 
-      {/* Animations */}
+      {/* Scan animation keyframe */}
       <style>{`
-        @keyframes fadeIn {
-          0% { opacity: 0; }
-          100% { opacity: 1; }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease forwards;
-        }
-        @keyframes popup {
-          0% { transform: scale(0.9); opacity: 0; }
-          100% { transform: scale(1); opacity: 1; }
-        }
-        .animate-popup {
-          animation: popup 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
         @keyframes scan {
           0% { transform: translateX(-100%); }
           100% { transform: translateX(100%); }
         }
-        .animate-scan {
-          animation: scan 6s linear infinite;
-          mix-blend-mode: screen;
-          opacity: 0.2;
-        }
       `}</style>
     </div>
   );
-};
+});

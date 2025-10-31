@@ -57,6 +57,51 @@ class InputControllerClass extends EventTarget {
     this.dispatchEvent(new Event(name));
   }
 
+  private normalizeKey(code: string, key: string): string {
+    // Normalize keys to consistent format
+    const keyMap: Record<string, string> = {
+      Space: "SPACE",
+      " ": "SPACE",
+      KeyS: "S",
+      s: "S",
+      S: "S",
+      KeyM: "M",
+      m: "M",
+      M: "M",
+      KeyF: "F",
+      f: "F",
+      F: "F",
+      KeyA: "A",
+      a: "A",
+      A: "A",
+      ArrowLeft: "LEFT",
+      ArrowRight: "RIGHT",
+    };
+
+    return keyMap[code] || keyMap[key] || "";
+  }
+
+  private checkGuards(action: InputEventName): boolean {
+    const canAct = !this.uiDisabled;
+    const hasBalance = this.balance >= this.betAmount;
+
+    switch (action) {
+      case "spin":
+        return canAct && !this.isAutoSpinning && hasBalance;
+      case "toggleFast":
+      case "decreaseBet":
+      case "increaseBet":
+        return canAct;
+      case "toggleAuto":
+      case "openSettings":
+      case "toggleMusic":
+      case "konami":
+        return true;
+      default:
+        return false;
+    }
+  }
+
   private handleKeyDown = (e: KeyboardEvent) => {
     if (!this.enabled) return;
 
@@ -75,46 +120,40 @@ class InputControllerClass extends EventTarget {
       this.konamiBuffer = [];
     }
 
-    // Guards
-    const canAct = !this.uiDisabled;
-    const canSpin =
-      canAct && !this.isAutoSpinning && this.balance >= this.betAmount;
-    const canAuto = canAct && this.balance >= this.betAmount;
+    const normalizedKey = this.normalizeKey(code, key);
+    if (!normalizedKey) return;
 
-    if (code === "Space" || key === " ") {
-      e.preventDefault();
-      if (canSpin) this.emit("spin");
-      return;
+    // Prevent default for all handled keys
+    e.preventDefault();
+
+    let action: InputEventName | null = null;
+
+    switch (normalizedKey) {
+      case "SPACE":
+        action = "spin";
+        break;
+      case "S":
+        action = "openSettings";
+        break;
+      case "M":
+        action = "toggleMusic";
+        break;
+      case "F":
+        action = "toggleFast";
+        break;
+      case "A":
+        action = "toggleAuto";
+        break;
+      case "LEFT":
+        action = "decreaseBet";
+        break;
+      case "RIGHT":
+        action = "increaseBet";
+        break;
     }
-    if (code === "KeyS" || key === "s" || key === "S") {
-      e.preventDefault();
-      this.emit("openSettings");
-      return;
-    }
-    if (code === "KeyM" || key === "m" || key === "M") {
-      e.preventDefault();
-      this.emit("toggleMusic");
-      return;
-    }
-    if (code === "KeyF" || key === "f" || key === "F") {
-      e.preventDefault();
-      if (canAct) this.emit("toggleFast");
-      return;
-    }
-    if (code === "KeyA" || key === "a" || key === "A") {
-      e.preventDefault();
-      if (canAuto) this.emit("toggleAuto");
-      return;
-    }
-    if (code === "ArrowLeft") {
-      e.preventDefault();
-      if (canAct) this.emit("decreaseBet");
-      return;
-    }
-    if (code === "ArrowRight") {
-      e.preventDefault();
-      if (canAct) this.emit("increaseBet");
-      return;
+
+    if (action && this.checkGuards(action)) {
+      this.emit(action);
     }
   };
 }
