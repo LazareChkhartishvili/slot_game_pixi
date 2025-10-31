@@ -19,6 +19,9 @@ export const useAssetPreloader = () => {
         await preloadGameAssets((progress) => {
           setLoadProgress(progress);
         });
+        
+        // Wait a bit to show 100% before hiding loading screen
+        await new Promise(resolve => setTimeout(resolve, 500));
         setIsLoading(false);
       } catch (error) {
         console.error("Failed to load assets:", error);
