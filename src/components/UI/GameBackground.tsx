@@ -15,6 +15,9 @@ export const GameBackground = ({ width, height }: Size) => {
   const [bgTexture, setBgTexture] = useState<Texture>(Texture.EMPTY);
   const [bgLoaded, setBgLoaded] = useState(false);
   const [cometTexture, setCometTexture] = useState<Texture | null>(null);
+  const [explodedCometIds, setExplodedCometIds] = useState<Set<number>>(
+    () => new Set()
+  );
 
   const baseStars = useStarfieldAnimation({ width, height });
   const { explosionsRef, forceUpdate } = useExplosionAnimation();
@@ -44,10 +47,6 @@ export const GameBackground = ({ width, height }: Size) => {
     loadBackground();
     loadComet();
   }, [width, height]);
-
-  const [explodedCometIds, setExplodedCometIds] = useState<Set<number>>(
-    () => new Set()
-  );
 
   const drawStars = useCallback(
     (g: PixiGraphicsType | null) => {

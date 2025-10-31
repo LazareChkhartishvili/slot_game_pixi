@@ -1,22 +1,30 @@
-import { useEffect, useState, useCallback, memo } from "react";
+import { useEffect, useState, useCallback, memo, useRef } from "react";
 
 const SPARKLE_INDICES = Array.from({ length: 20 }, (_, i) => i);
 
 export const KonamiEffect = memo(() => {
   const [showEffect, setShowEffect] = useState(false);
+  const effectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleKonamiCode = useCallback(() => {
     setShowEffect(true);
-    setTimeout(() => setShowEffect(false), 4000);
+    if (effectTimeoutRef.current) {
+      clearTimeout(effectTimeoutRef.current);
+    }
+    effectTimeoutRef.current = setTimeout(() => setShowEffect(false), 4000);
   }, []);
 
   useEffect(() => {
     window.addEventListener("konamiCode", handleKonamiCode as EventListener);
-    return () =>
+    return () => {
       window.removeEventListener(
         "konamiCode",
         handleKonamiCode as EventListener
       );
+      if (effectTimeoutRef.current) {
+        clearTimeout(effectTimeoutRef.current);
+      }
+    };
   }, [handleKonamiCode]);
 
   if (!showEffect) return null;

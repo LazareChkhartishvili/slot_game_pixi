@@ -37,6 +37,10 @@ export const SlotGameContainer = ({ width, height }: Size) => {
   const isMusicPlayingRef = useRef(false);
   const isAutoSpinningRef = useRef(false);
   const isFastModeRef = useRef(false);
+  const konamiTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const uiTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const autoSpinTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const autoSpinStartTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const layout = useLayoutDimensions({ width, height });
   const layoutRef = useRef(layout);
@@ -90,7 +94,7 @@ export const SlotGameContainer = ({ width, height }: Size) => {
 
         if (document.body) {
           document.body.classList.add("konami-active");
-          setTimeout(() => {
+          konamiTimeoutRef.current = setTimeout(() => {
             document.body.classList.remove("konami-active");
           }, 3000);
         }
@@ -98,17 +102,32 @@ export const SlotGameContainer = ({ width, height }: Size) => {
     };
 
     window.addEventListener("konamiCode", handleKonamiCode as EventListener);
-    return () =>
+    return () => {
       window.removeEventListener(
         "konamiCode",
         handleKonamiCode as EventListener
       );
+      if (konamiTimeoutRef.current) {
+        clearTimeout(konamiTimeoutRef.current);
+        konamiTimeoutRef.current = null;
+      }
+    };
   }, []);
 
   const handleSpin = useCallback(() => {
     if (!slotMachineRef.current) return;
 
     setUiDisabled(true);
+
+    // Clear any existing timeouts
+    if (uiTimeoutRef.current) {
+      clearTimeout(uiTimeoutRef.current);
+      uiTimeoutRef.current = null;
+    }
+    if (autoSpinTimeoutRef.current) {
+      clearTimeout(autoSpinTimeoutRef.current);
+      autoSpinTimeoutRef.current = null;
+    }
 
     slotMachineRef.current
       .spin()
@@ -121,7 +140,7 @@ export const SlotGameContainer = ({ width, height }: Size) => {
             ? GAME_CONFIG.ANIMATION.UI_DISABLE_DURATION * 0.6
             : GAME_CONFIG.ANIMATION.UI_DISABLE_DURATION;
 
-          setTimeout(() => {
+          uiTimeoutRef.current = setTimeout(() => {
             setUiDisabled(false);
 
             if (
@@ -129,7 +148,7 @@ export const SlotGameContainer = ({ width, height }: Size) => {
               newState.balance >= newState.betAmount
             ) {
               const autoSpinDelay = isFastModeRef.current ? 200 : 500;
-              setTimeout(() => {
+              autoSpinTimeoutRef.current = setTimeout(() => {
                 handleSpin();
               }, autoSpinDelay);
             } else if (
@@ -205,9 +224,12 @@ export const SlotGameContainer = ({ width, height }: Size) => {
       const newValue = !prev;
 
       if (newValue && !gameState.isSpinning && !uiDisabled) {
-        setTimeout(() => {
+        autoSpinStartTimeoutRef.current = setTimeout(() => {
           handleSpin();
         }, 0);
+      } else if (!newValue && autoSpinStartTimeoutRef.current) {
+        clearTimeout(autoSpinStartTimeoutRef.current);
+        autoSpinStartTimeoutRef.current = null;
       }
 
       return newValue;
@@ -216,6 +238,21 @@ export const SlotGameContainer = ({ width, height }: Size) => {
 
   const handleToggleFastMode = useCallback(() => {
     setIsFastMode((prev) => !prev);
+  }, []);
+
+  // Cleanup all timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (uiTimeoutRef.current) {
+        clearTimeout(uiTimeoutRef.current);
+      }
+      if (autoSpinTimeoutRef.current) {
+        clearTimeout(autoSpinTimeoutRef.current);
+      }
+      if (autoSpinStartTimeoutRef.current) {
+        clearTimeout(autoSpinStartTimeoutRef.current);
+      }
+    };
   }, []);
 
   useKeyboardControls({

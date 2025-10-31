@@ -32,6 +32,9 @@ export const ReelColumn = ({
   const reelHasWinningSymbolsRef = useRef(false);
 
   const finalPositionsRef = useRef<number[] | null>(null);
+  const startTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const bounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const stopTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const spinSpeed = GAME_CONFIG.ANIMATION.SPIN_SPEED;
   const spinSpeedRef = useRef(spinSpeed);
@@ -226,7 +229,7 @@ export const ReelColumn = ({
 
     removeAll();
 
-    setTimeout(() => {
+    startTimeoutRef.current = setTimeout(() => {
       const bounce = { y: 0 };
 
       new Tween(bounce)
@@ -249,7 +252,7 @@ export const ReelColumn = ({
                     .easing(Easing.Back.Out)
                     .onUpdate(() => setOffset(bounce.y))
                     .onComplete(() => {
-                      setTimeout(() => {
+                      bounceTimeoutRef.current = setTimeout(() => {
                         spinOneSymbol();
                       }, 30);
                     })
@@ -276,7 +279,7 @@ export const ReelColumn = ({
     if (isSpinning && !spinningRef.current) {
       startSpinning();
     } else if (!isSpinning && spinningRef.current && !stoppingRef.current) {
-      setTimeout(() => {
+      stopTimeoutRef.current = setTimeout(() => {
         stopSpinning();
       }, reelIndex * stopDelayPerReel);
     }
@@ -285,6 +288,18 @@ export const ReelColumn = ({
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = null;
+      }
+      if (startTimeoutRef.current) {
+        clearTimeout(startTimeoutRef.current);
+        startTimeoutRef.current = null;
+      }
+      if (bounceTimeoutRef.current) {
+        clearTimeout(bounceTimeoutRef.current);
+        bounceTimeoutRef.current = null;
+      }
+      if (stopTimeoutRef.current) {
+        clearTimeout(stopTimeoutRef.current);
+        stopTimeoutRef.current = null;
       }
     };
   }, [
@@ -312,8 +327,7 @@ export const ReelColumn = ({
     (rowIndex: number) => {
       if (!hasWinningSymbols) return false;
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      return winningPositions.some(([_, row]) => row === rowIndex);
+      return winningPositions.some(([, row]) => row === rowIndex);
     },
     [hasWinningSymbols, winningPositions]
   );

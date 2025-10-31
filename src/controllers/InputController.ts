@@ -36,6 +36,12 @@ class InputControllerClass extends EventTarget {
     }
   }
 
+  cleanup() {
+    if (typeof window !== "undefined") {
+      window.removeEventListener("keydown", this.handleKeyDown);
+    }
+  }
+
   updateGuards(params: {
     uiDisabled?: boolean;
     isAutoSpinning?: boolean;

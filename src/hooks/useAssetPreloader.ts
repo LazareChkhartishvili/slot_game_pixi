@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { preloadGameAssets, type PreloadProgress } from "../utils/assetPreloader";
 
 export const useAssetPreloader = () => {
@@ -8,6 +8,7 @@ export const useAssetPreloader = () => {
     total: 0,
     percentage: 0,
   });
+  const loadTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const loadAssets = async () => {
@@ -16,7 +17,9 @@ export const useAssetPreloader = () => {
           setLoadProgress(progress);
         });
         
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise(resolve => {
+          loadTimeoutRef.current = setTimeout(resolve, 500);
+        });
         setIsLoading(false);
       } catch (error) {
         console.error("Failed to load assets:", error);
@@ -25,6 +28,12 @@ export const useAssetPreloader = () => {
     };
 
     loadAssets();
+
+    return () => {
+      if (loadTimeoutRef.current) {
+        clearTimeout(loadTimeoutRef.current);
+      }
+    };
   }, []);
 
   return { isLoading, loadProgress };

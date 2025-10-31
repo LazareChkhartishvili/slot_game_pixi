@@ -4,6 +4,7 @@ import type { SlotMachineState } from "../types";
 export class SlotMachineService {
   private state: SlotMachineState;
   private readonly totalSymbols: number;
+  private spinTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     columns: number = GAME_CONFIG.REELS.COLUMNS,
@@ -55,13 +56,14 @@ export class SlotMachineService {
 
         this.state.reelPositions = newPositions;
 
-        setTimeout(() => {
+        this.spinTimeoutId = setTimeout(() => {
           const { win, winningPositions } = this.calculateWin();
           this.state.lastWin = win;
           this.state.balance =
             Math.round((this.state.balance + win) * 100) / 100;
           this.state.isSpinning = false;
           this.state.winningPositions = winningPositions;
+          this.spinTimeoutId = null;
           resolve({ win });
         }, GAME_CONFIG.ANIMATION.REEL_SPIN_DURATION);
       } catch (error) {
@@ -181,9 +183,18 @@ export class SlotMachineService {
     this.state.balance = Math.round((this.state.balance + amount) * 100) / 100;
   }
 
+  cleanup(): void {
+    if (this.spinTimeoutId) {
+      clearTimeout(this.spinTimeoutId);
+      this.spinTimeoutId = null;
+    }
+  }
+
   reset(): void {
+    this.cleanup();
+
     if (this.state.isSpinning) {
-      throw new Error("Cannot reset while spinning");
+      this.state.isSpinning = false;
     }
 
     const columns = this.state.reelPositions.length;
