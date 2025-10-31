@@ -1,7 +1,3 @@
-/**
- * Loading screen with progress bar
- */
-
 interface LoadingScreenProps {
   progress: number;
   total?: number;
