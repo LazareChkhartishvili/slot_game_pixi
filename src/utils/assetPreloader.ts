@@ -1,7 +1,3 @@
-/**
- * Asset Preloader - Preload all game assets at startup
- */
-
 import { Assets } from "pixi.js";
 import { SYMBOL_ASSETS, BG_ASSETS } from "../constants/assets";
 
@@ -11,19 +7,13 @@ export interface PreloadProgress {
   percentage: number;
 }
 
-/**
- * Preload all game assets
- */
 export const preloadGameAssets = async (
   onProgress?: (progress: PreloadProgress) => void
 ): Promise<void> => {
-  // Define all assets to preload
   const allAssets = [
-    // Symbols
     ...SYMBOL_ASSETS.map((path) => `/${path}`),
-    // Symbol backgrounds
     ...BG_ASSETS.map((path) => `/${path}`),
-    // UI assets
+
     "/images/background.jpg",
     "/images/logo.png",
     "/images/symbols/comet.png",
@@ -41,14 +31,15 @@ export const preloadGameAssets = async (
   const total = allAssets.length;
   let loaded = 0;
 
-  // Add bundle for better management
-  Assets.addBundle("game", allAssets.reduce((acc, path, index) => {
-    acc[`asset-${index}`] = path;
-    return acc;
-  }, {} as Record<string, string>));
+  Assets.addBundle(
+    "game",
+    allAssets.reduce((acc, path, index) => {
+      acc[`asset-${index}`] = path;
+      return acc;
+    }, {} as Record<string, string>)
+  );
 
   try {
-    // Load all assets in parallel with progress tracking
     await Assets.loadBundle("game", (progress) => {
       loaded = Math.floor(progress * total);
       const percentage = Math.min(Math.round(progress * 100), 100);
@@ -59,24 +50,17 @@ export const preloadGameAssets = async (
       });
     });
 
-    // Ensure 100% is shown at the end
     onProgress?.({
       loaded: total,
       total,
       percentage: 100,
     });
-
-    console.log(`✅ Loaded ${total} assets successfully`);
   } catch (error) {
     console.error("❌ Failed to preload assets:", error);
     throw error;
   }
 };
 
-/**
- * Check if an asset is already loaded
- */
 export const isAssetLoaded = (path: string): boolean => {
   return Assets.cache.has(path);
 };
-

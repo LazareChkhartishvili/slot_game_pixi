@@ -30,7 +30,6 @@ export const SpinActionButton = ({
     loadSpinIcon();
   }, [spinIconPath]);
 
-  // Select colors based on spinning state
   const colors = isSpinning
     ? BUTTON_COLORS.spinActive
     : BUTTON_COLORS.spinInactive;
@@ -49,7 +48,7 @@ export const SpinActionButton = ({
         stopCorner,
       } = BUTTON_DIMENSIONS.spin;
 
-      // Shadow
+      // Shadow-ebi
       g.beginFill(colors.shadow);
       g.drawRoundedRect(
         -width / 2,

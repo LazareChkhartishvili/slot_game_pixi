@@ -16,7 +16,6 @@ export const useStarfieldAnimation = ({
 }: UseStarfieldAnimationProps) => {
   const [stars, setStars] = useState<Star[]>([]);
 
-  // Initialize stars and comets
   useEffect(() => {
     const newStars: Star[] = [];
 
@@ -34,7 +33,7 @@ export const useStarfieldAnimation = ({
       });
     }
 
-    // Create comets (faster speed)
+    // Create comets (but ufro fasterrr)
     for (let i = 0; i < cometCount; i++) {
       newStars.push({
         id: starCount + i,

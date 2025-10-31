@@ -44,7 +44,6 @@ export const ToggleIconButton = memo(
       loadIcons();
     }, [activeIconPath, inactiveIconPath]);
 
-    // Select colors based on active state
     const colors = isActive
       ? BUTTON_COLORS.toggleActive
       : BUTTON_COLORS.toggleInactive;

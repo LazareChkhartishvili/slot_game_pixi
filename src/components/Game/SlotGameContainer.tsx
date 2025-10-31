@@ -189,8 +189,8 @@ export const SlotGameContainer = ({ width, height }: Size) => {
 
         sound.stop("background-music");
         sound.play("background-music", {
-          start: 11, // Start from 11 seconds
-          loop: true, // Good music should loop
+          start: 11,
+          loop: true,
         });
       } catch (error) {
         console.error("Failed to play music:", error);
@@ -203,15 +203,13 @@ export const SlotGameContainer = ({ width, height }: Size) => {
   const handleToggleAutoSpin = useCallback(() => {
     setIsAutoSpinning((prev) => {
       const newValue = !prev;
-      
-      // თუ auto-spin ჩაირთო და არ ტრიალებს, დაიწყე spin
+
       if (newValue && !gameState.isSpinning && !uiDisabled) {
-        // დაელოდოს state update-ს და დაიწყოს spin
         setTimeout(() => {
           handleSpin();
         }, 0);
       }
-      
+
       return newValue;
     });
   }, [gameState.isSpinning, uiDisabled, handleSpin]);
@@ -323,7 +321,11 @@ export const SlotGameContainer = ({ width, height }: Size) => {
 
       <SpinActionButton
         handleSpin={handleSpin}
-        disabled={uiDisabled || isAutoSpinning || gameState.balance < gameState.betAmount}
+        disabled={
+          uiDisabled ||
+          isAutoSpinning ||
+          gameState.balance < gameState.betAmount
+        }
         isSpinning={uiDisabled || isAutoSpinning}
         x={layout.spinButtonX}
         y={layout.spinButtonY}

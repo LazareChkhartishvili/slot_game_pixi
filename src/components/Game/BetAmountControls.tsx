@@ -65,11 +65,11 @@ export const BetAmountControls = ({
 
   const getBetStep = useCallback((currentBet: number): number => {
     if (currentBet < 2.0) {
-      return 0.2; // Step by $0.20 until $2.00
+      return 0.2;
     } else if (currentBet < 10.0) {
-      return 1.0; // Step by $1.00 until $10.00
+      return 1.0;
     } else {
-      return 5.0; // Step by $5.00 above $10.00
+      return 5.0;
     }
   }, []);
 
