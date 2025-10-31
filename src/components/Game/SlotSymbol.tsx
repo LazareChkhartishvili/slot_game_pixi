@@ -72,7 +72,6 @@ export const SlotSymbol = ({
         height={height}
       />
 
-      {/* Add extra glow sprite for winning symbols */}
       {isWinning && (
         <>
           <Sprite

@@ -28,7 +28,6 @@ export const useKeyboardControls = ({
   betAmount,
 }: UseKeyboardControlsProps) => {
   useEffect(() => {
-    // Keep controller in sync with guards
     InputController.updateGuards({
       uiDisabled,
       isAutoSpinning,
@@ -38,7 +37,6 @@ export const useKeyboardControls = ({
   }, [uiDisabled, isAutoSpinning, balance, betAmount]);
 
   useEffect(() => {
-    // Setup InputController event listeners
     const onSpinHandler = () => onSpin();
     const onOpenHandler = () => onOpenSettings();
     const onMusicHandler = () => onToggleMusic();

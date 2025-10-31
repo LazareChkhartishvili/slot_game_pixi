@@ -11,7 +11,7 @@ export const useSymbolBackgroundAnimation = (
     if (!bgLoaded) return;
     let time = 0;
     const unsubscribe = AnimationLoop.subscribe((dt) => {
-      time += dt * 0.001; // convert ms to seconds-ish scale
+      time += dt * 0.001;
       if (ref.current) {
         const pulseScale = 1 + Math.sin(time * 2.5) * 0.08;
         ref.current.scale.set(pulseScale, pulseScale);

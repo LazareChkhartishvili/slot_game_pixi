@@ -1,10 +1,6 @@
 import { useEffect } from "react";
 import { InputController } from "../controllers/InputController";
 
-/**
- * Hook to handle Konami code detection from InputController
- * Dispatches a custom "konamiCode" event on window when Konami code is detected
- */
 export const useKonamiHandler = () => {
   useEffect(() => {
     const handler = () => {
@@ -19,4 +15,3 @@ export const useKonamiHandler = () => {
     };
   }, []);
 };
-

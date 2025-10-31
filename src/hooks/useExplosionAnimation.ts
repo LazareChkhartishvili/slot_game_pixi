@@ -9,7 +9,7 @@ export const useExplosionAnimation = () => {
   useEffect(() => {
     let accumulator = 0;
     const targetFPS = 60;
-    const frameTime = 1000 / targetFPS; // ~16.67ms per frame
+    const frameTime = 1000 / targetFPS;
 
     const unsubscribe = AnimationLoop.subscribe((dt) => {
       if (explosionsRef.current.length === 0) return;
@@ -33,8 +33,6 @@ export const useExplosionAnimation = () => {
         )
         .filter((explosion) => explosion.length > 0);
 
-      // Throttle React re-renders to ~60 FPS (particles update at full animation speed)
-      // This balances smooth 60 FPS animation with React performance
       if (accumulator >= frameTime) {
         accumulator = 0;
         forceUpdate({});

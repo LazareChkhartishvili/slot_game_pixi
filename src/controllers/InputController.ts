@@ -58,7 +58,6 @@ class InputControllerClass extends EventTarget {
   }
 
   private normalizeKey(code: string, key: string): string {
-    // Normalize keys to consistent format
     const keyMap: Record<string, string> = {
       Space: "SPACE",
       " ": "SPACE",
@@ -107,7 +106,6 @@ class InputControllerClass extends EventTarget {
 
     const { code, key } = e;
 
-    // Konami detection (always record)
     this.konamiBuffer.push(key);
     if (this.konamiBuffer.length > this.konamiSeq.length) {
       this.konamiBuffer.shift();
@@ -123,7 +121,6 @@ class InputControllerClass extends EventTarget {
     const normalizedKey = this.normalizeKey(code, key);
     if (!normalizedKey) return;
 
-    // Prevent default for all handled keys
     e.preventDefault();
 
     let action: InputEventName | null = null;

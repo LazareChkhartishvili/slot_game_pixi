@@ -19,9 +19,6 @@ import { ReelsContainer } from "./ReelsContainer";
 import { useBalanceAnimation } from "../../hooks/useBalanceAnimation";
 import { useBorderAnimation } from "../../hooks/useBorderAnimation";
 
-/**
- * SlotMachineReels component - Main game machine rendering
- */
 export const SlotMachineReels = forwardRef<SlotMachineRef, SlotMachineProps>(
   ({ x, y, width, height, onStateUpdate, fastMode = false }, ref) => {
     const columns = GAME_CONFIG.REELS.COLUMNS;
@@ -35,7 +32,6 @@ export const SlotMachineReels = forwardRef<SlotMachineRef, SlotMachineProps>(
     const displayBalance = useBalanceAnimation(gameState.balance);
     const borderAnimation = useBorderAnimation();
 
-    // Notify parent of state changes
     useEffect(() => {
       if (onStateUpdate) {
         onStateUpdate({
@@ -45,7 +41,6 @@ export const SlotMachineReels = forwardRef<SlotMachineRef, SlotMachineProps>(
       }
     }, [gameState, onStateUpdate, displayBalance]);
 
-    // Expose methods to parent component
     useImperativeHandle(ref, () => ({
       spin: async () => {
         if (gameState.isSpinning) {
@@ -81,7 +76,6 @@ export const SlotMachineReels = forwardRef<SlotMachineRef, SlotMachineProps>(
       },
     }));
 
-    // Calculate dimensions for each cell in the grid
     const cellWidth = width / columns;
     const cellHeight = height / rows;
 
@@ -89,15 +83,12 @@ export const SlotMachineReels = forwardRef<SlotMachineRef, SlotMachineProps>(
       (g: GraphicsType) => {
         g.clear();
         g.beginFill(0x000000, 0.15);
-        // Outer rectangle - exact size, no padding
         g.drawRoundedRect(-width / 2, -height / 2, width, height, 16);
         g.endFill();
 
-        // Neon blue glowing border animation - only top and bottom edges
-        const neonBlue = 0x00bfff; // Bright neon blue like in the image
+        const neonBlue = 0x00bfff;
         const borderRadius = 16;
 
-        // Draw neon border on top and bottom edges only with rounded corners
         const drawNeonBorder = (isTop: boolean) => {
           const halfWidth = width / 2;
           const halfHeight = height / 2;
@@ -105,17 +96,14 @@ export const SlotMachineReels = forwardRef<SlotMachineRef, SlotMachineProps>(
           const leftCornerX = -halfWidth + borderRadius;
           const rightCornerX = halfWidth - borderRadius;
 
-          // Left corner arc center
           const leftCornerCenterX = -halfWidth + borderRadius;
           const leftCornerCenterY =
             edgeY + (isTop ? borderRadius : -borderRadius);
 
-          // Right corner arc center
           const rightCornerCenterX = halfWidth - borderRadius;
           const rightCornerCenterY =
             edgeY + (isTop ? borderRadius : -borderRadius);
 
-          // Calculate path length (left corner + horizontal + right corner)
           const pathLength =
             Math.PI * borderRadius +
             (rightCornerX - leftCornerX) +
@@ -123,7 +111,6 @@ export const SlotMachineReels = forwardRef<SlotMachineRef, SlotMachineProps>(
 
           let currentPathProgress = 0;
 
-          // Left corner arc
           const arcLength = (Math.PI / 2) * borderRadius;
           const leftStartAngle = isTop ? Math.PI : Math.PI / 2;
           const leftEndAngle = isTop ? Math.PI + Math.PI / 2 : Math.PI;
@@ -145,7 +132,6 @@ export const SlotMachineReels = forwardRef<SlotMachineRef, SlotMachineProps>(
             const progress =
               (currentPathProgress / pathLength + borderAnimation) % 1;
 
-            // Smooth traveling light effect
             const lightPos = progress;
             const lightWidth = 0.15;
             const distFromLight = Math.abs(
@@ -155,10 +141,8 @@ export const SlotMachineReels = forwardRef<SlotMachineRef, SlotMachineProps>(
 
             let opacity;
             if (normalizedDist < lightWidth) {
-              // Smooth gradient for traveling light
               opacity = 1.0 - (normalizedDist / lightWidth) * 0.3;
             } else {
-              // Very subtle, smooth base glow - no pulse
               opacity = 0.5;
             }
 
@@ -169,7 +153,6 @@ export const SlotMachineReels = forwardRef<SlotMachineRef, SlotMachineProps>(
             currentPathProgress += arcLength / arcSegments;
           }
 
-          // Horizontal edge
           const horizontalLength = rightCornerX - leftCornerX;
           const horizontalSegments = 50;
 
@@ -182,7 +165,6 @@ export const SlotMachineReels = forwardRef<SlotMachineRef, SlotMachineProps>(
             const progress =
               (currentPathProgress / pathLength + borderAnimation) % 1;
 
-            // Smooth traveling light effect
             const lightPos = progress;
             const lightWidth = 0.15;
             const distFromLight = Math.abs(
@@ -192,10 +174,8 @@ export const SlotMachineReels = forwardRef<SlotMachineRef, SlotMachineProps>(
 
             let opacity;
             if (normalizedDist < lightWidth) {
-              // Smooth gradient for traveling light
               opacity = 1.0 - (normalizedDist / lightWidth) * 0.3;
             } else {
-              // Very subtle, smooth base glow - no pulse
               opacity = 0.5;
             }
 
@@ -206,7 +186,6 @@ export const SlotMachineReels = forwardRef<SlotMachineRef, SlotMachineProps>(
             currentPathProgress += horizontalLength / horizontalSegments;
           }
 
-          // Right corner arc
           const rightStartAngle = isTop ? -Math.PI / 2 : 0;
           const rightEndAngle = isTop ? 0 : Math.PI / 2;
 
@@ -226,7 +205,6 @@ export const SlotMachineReels = forwardRef<SlotMachineRef, SlotMachineProps>(
             const progress =
               (currentPathProgress / pathLength + borderAnimation) % 1;
 
-            // Smooth traveling light effect
             const lightPos = progress;
             const lightWidth = 0.15;
             const distFromLight = Math.abs(
@@ -236,10 +214,8 @@ export const SlotMachineReels = forwardRef<SlotMachineRef, SlotMachineProps>(
 
             let opacity;
             if (normalizedDist < lightWidth) {
-              // Smooth gradient for traveling light
               opacity = 1.0 - (normalizedDist / lightWidth) * 0.3;
             } else {
-              // Very subtle, smooth base glow - no pulse
               opacity = 0.5;
             }
 
@@ -251,7 +227,6 @@ export const SlotMachineReels = forwardRef<SlotMachineRef, SlotMachineProps>(
           }
         };
 
-        // Draw neon border on top and bottom edges only
         drawNeonBorder(true);
         drawNeonBorder(false);
       },

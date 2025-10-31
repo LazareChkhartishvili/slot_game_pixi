@@ -41,23 +41,19 @@ export const SlotGameContainer = ({ width, height }: Size) => {
   const layout = useLayoutDimensions({ width, height });
   const layoutRef = useRef(layout);
 
-  // Update layout ref when layout changes
   useEffect(() => {
     layoutRef.current = layout;
   }, [layout]);
 
-  // Initialize PixiJS Sound
   useEffect(() => {
-    // Add music sound (user can add music file to public/music/background.mp3 or music.ogg)
     sound.add("background-music", {
       url: "/music/music.ogg",
       loop: true,
-      volume: 0.5, // 50% volume
-      preload: true, // Preload the sound
+      volume: 0.5,
+      preload: true,
     });
 
     return () => {
-      // Cleanup: stop and remove sound when component unmounts
       if (sound.exists("background-music")) {
         sound.stop("background-music");
         sound.remove("background-music");
@@ -65,7 +61,6 @@ export const SlotGameContainer = ({ width, height }: Size) => {
     };
   }, []);
 
-  // Sync refs with state
   useEffect(() => {
     isMusicPlayingRef.current = isMusicPlaying;
   }, [isMusicPlaying]);
@@ -78,25 +73,21 @@ export const SlotGameContainer = ({ width, height }: Size) => {
     isFastModeRef.current = isFastMode;
   }, [isFastMode]);
 
-  // Get initial state from controller
   useEffect(() => {
     if (slotMachineRef.current) {
       setGameState(slotMachineRef.current.getState());
     }
   }, []);
 
-  // Listen for Konami code bonus
   useEffect(() => {
     const handleKonamiCode = (e: Event) => {
       const customEvent = e as CustomEvent;
       const bonus = customEvent.detail?.bonus || 1000000;
 
       if (slotMachineRef.current && slotMachineRef.current.addBonus) {
-        // Add bonus to balance
         slotMachineRef.current.addBonus(bonus);
         setGameState(slotMachineRef.current.getState());
 
-        // Trigger retro animation on document.body
         if (document.body) {
           document.body.classList.add("konami-active");
           setTimeout(() => {
@@ -122,13 +113,10 @@ export const SlotGameContainer = ({ width, height }: Size) => {
     slotMachineRef.current
       .spin()
       .then(() => {
-        // Update state after spin
         if (slotMachineRef.current) {
           const newState = slotMachineRef.current.getState();
           setGameState(newState);
 
-          // Keep UI disabled for longer duration to match reel animation
-          // Fast mode: reduce disable duration
           const disableDuration = isFastModeRef.current
             ? GAME_CONFIG.ANIMATION.UI_DISABLE_DURATION * 0.6
             : GAME_CONFIG.ANIMATION.UI_DISABLE_DURATION;
@@ -136,12 +124,10 @@ export const SlotGameContainer = ({ width, height }: Size) => {
           setTimeout(() => {
             setUiDisabled(false);
 
-            // Auto-spin: if enabled and has enough balance, spin again
             if (
               isAutoSpinningRef.current &&
               newState.balance >= newState.betAmount
             ) {
-              // Small delay before next auto-spin
               const autoSpinDelay = isFastModeRef.current ? 200 : 500;
               setTimeout(() => {
                 handleSpin();
@@ -150,7 +136,6 @@ export const SlotGameContainer = ({ width, height }: Size) => {
               isAutoSpinningRef.current &&
               newState.balance < newState.betAmount
             ) {
-              // Stop auto-spin if not enough balance
               setIsAutoSpinning(false);
             }
           }, disableDuration);
@@ -159,7 +144,6 @@ export const SlotGameContainer = ({ width, height }: Size) => {
       .catch((error) => {
         console.error("Spin failed:", error);
         setUiDisabled(false);
-        // Stop auto-spin on error
         if (isAutoSpinningRef.current) {
           setIsAutoSpinning(false);
         }
@@ -174,7 +158,6 @@ export const SlotGameContainer = ({ width, height }: Size) => {
   }, []);
 
   const handleOpenModal = useCallback(() => {
-    // Open DOM overlay outside the canvas with slot bounds
     const currentLayout = layoutRef.current;
     window.dispatchEvent(
       new CustomEvent("settingsOpen", {
@@ -192,32 +175,27 @@ export const SlotGameContainer = ({ width, height }: Size) => {
     const currentState = isMusicPlayingRef.current;
     const newState = !currentState;
 
-    // Update both state and ref
     setIsMusicPlaying(newState);
     isMusicPlayingRef.current = newState;
 
-    // Control music immediately on click (user interaction)
     if (!sound.exists("background-music")) {
       return;
     }
 
     if (newState) {
-      // Play music from the beginning and let it loop naturally
       try {
         const inst = sound.find("background-music");
         if (inst && inst.isPlaying) return;
 
-        // Stop and play from the beginning
         sound.stop("background-music");
         sound.play("background-music", {
-          start: 11, // Start from the beginning
-          loop: true, // Loop the entire track
+          start: 11, // Start from 11 seconds
+          loop: true, // Good music should loop
         });
       } catch (error) {
-        // Silent fail - music is not critical
+        console.error("Failed to play music:", error);
       }
     } else {
-      // Stop the music
       sound.stop("background-music");
     }
   }, []);
@@ -227,7 +205,6 @@ export const SlotGameContainer = ({ width, height }: Size) => {
   }, []);
 
   const handleToggleFastMode = useCallback(() => {
-    // Prevent toggling fast mode while reels are spinning or UI is locked
     if (uiDisabled || gameState.isSpinning) return;
     setIsFastMode((prev) => !prev);
   }, [uiDisabled, gameState.isSpinning]);
@@ -245,7 +222,6 @@ export const SlotGameContainer = ({ width, height }: Size) => {
     betAmount: gameState.betAmount,
   });
 
-  // Style for text below slot machine - memoized to prevent recreation
   const textBelowStyle = useMemo(
     () =>
       new TextStyle({
@@ -341,8 +317,6 @@ export const SlotGameContainer = ({ width, height }: Size) => {
         x={layout.spinButtonX}
         y={layout.spinButtonY}
       />
-
-      {/* DOM SettingsOverlay handles UI outside canvas now */}
     </Container>
   );
 };

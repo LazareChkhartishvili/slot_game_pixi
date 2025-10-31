@@ -2,6 +2,11 @@ import { Container, Graphics, Sprite } from "@pixi/react";
 import { useCallback, useEffect, useState } from "react";
 import { Assets, Graphics as GraphicTypes } from "pixi.js";
 import type { SpinButtonProps } from "../../types";
+import {
+  BUTTON_COLORS,
+  BUTTON_DIMENSIONS,
+  OPACITY,
+} from "../../constants/theme";
 
 export const SpinActionButton = ({
   handleSpin,
@@ -25,57 +30,61 @@ export const SpinActionButton = ({
     loadSpinIcon();
   }, [spinIconPath]);
 
+  // Select colors based on spinning state
+  const colors = isSpinning
+    ? BUTTON_COLORS.spinActive
+    : BUTTON_COLORS.spinInactive;
+
   const drawSpinButton = useCallback(
     (g: GraphicTypes) => {
       g.clear();
 
-      // ზომები — ოდნავ შემცირებული
-      const width = 240;
-      const height = 140; // Increased from 110 to 120
-      const cornerRadius = 28;
+      const {
+        width,
+        height,
+        cornerRadius,
+        shadowOffset,
+        overlayPadding,
+        stopSize,
+        stopCorner,
+      } = BUTTON_DIMENSIONS.spin;
 
-      // ფერთა პალიტრა (მუქი მწვანეები/წითლები)
-      const baseColor = isSpinning ? "#b11d40" : 0x789e1a; // Dark green - main layer
-      const shadowColor = isSpinning ? 0x7f132e : 0x4c5a0e; // Darker shadow
-
-      /** ქვედა ჩრდილი (ღრმა ილუზია) - Only ONE shadow */
-      g.beginFill(shadowColor);
+      // Shadow
+      g.beginFill(colors.shadow);
       g.drawRoundedRect(
         -width / 2,
-        -height / 2 + 6,
+        -height / 2 + shadowOffset,
         width,
         height,
         cornerRadius
       );
       g.endFill();
 
-      /** ზედა ფენა — მთავარი ღილაკი */
-      g.beginFill(baseColor);
+      // Base button
+      g.beginFill(colors.base);
       g.drawRoundedRect(
         -width / 2,
         -height / 2,
         width,
-        height - 6,
+        height - shadowOffset,
         cornerRadius
       );
       g.endFill();
 
-      /** შიდა overlay, რომ ჰქონდეს "დამჯდარი" 3D ეფექტი */
-      g.beginFill(0x000000, 0.1);
+      // Inner overlay
+      g.beginFill(BUTTON_COLORS.overlay, OPACITY.overlay);
       g.drawRoundedRect(
-        -width / 2 + 5,
-        -height / 2 + 5,
-        width - 10,
-        height - 14,
-        cornerRadius - 5
+        -width / 2 + overlayPadding,
+        -height / 2 + overlayPadding,
+        width - overlayPadding * 2,
+        height - shadowOffset - overlayPadding * 2,
+        cornerRadius - overlayPadding
       );
       g.endFill();
 
-      if (isSpinning) {
-        /** STOP სიმბოლო */
-        const stopSize = 55;
-        const stopCorner = 12;
-        g.beginFill("#631b33");
+      // Stop icon when spinning
+      if (isSpinning && "stopIcon" in colors) {
+        g.beginFill(colors.stopIcon);
         g.drawRoundedRect(
           -stopSize / 2,
           -stopSize / 2,
@@ -85,9 +94,8 @@ export const SpinActionButton = ({
         );
         g.endFill();
       }
-      // Play icon will be rendered as Sprite, not drawn here
     },
-    [isSpinning]
+    [colors, isSpinning]
   );
 
   const spinIconTexture = spinIconLoaded ? Assets.get(spinIconPath) : null;
@@ -98,15 +106,15 @@ export const SpinActionButton = ({
       eventMode={disabled ? "none" : "static"}
       cursor="pointer"
       pointerdown={disabled ? undefined : handleSpin}
-      alpha={disabled ? 0.6 : 1}
+      alpha={disabled ? OPACITY.disabled : 1}
     >
       <Graphics draw={drawSpinButton} />
       {!isSpinning && spinIconTexture && (
         <Sprite
           texture={spinIconTexture}
           anchor={[0.5, 0.5]}
-          width={60}
-          height={60}
+          width={BUTTON_DIMENSIONS.spin.iconSize}
+          height={BUTTON_DIMENSIONS.spin.iconSize}
         />
       )}
     </Container>

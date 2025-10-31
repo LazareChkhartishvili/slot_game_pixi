@@ -10,7 +10,6 @@ import { useStarfieldAnimation } from "../../hooks/useStarfieldAnimation";
 import { CometSprite } from "./CometSprite";
 import { ExplosionEffect } from "./ExplosionEffect";
 
-// Explosion particle constants
 const EXPLOSION_COLORS = [0xffaa00, 0xff6600, 0xff0000, 0xffff00];
 const PARTICLE_COUNT = 30;
 
@@ -22,7 +21,6 @@ export const GameBackground = ({ width, height }: Size) => {
   const baseStars = useStarfieldAnimation({ width, height });
   const { explosionsRef, forceUpdate } = useExplosionAnimation();
 
-  // Load background image and comet texture
   useEffect(() => {
     const loadBackground = async () => {
       try {
@@ -50,7 +48,7 @@ export const GameBackground = ({ width, height }: Size) => {
   }, [width, height]);
 
   const [explodedCometIds, setExplodedCometIds] = useState<Set<number>>(
-    new Set()
+    () => new Set()
   );
 
   const drawStars = useCallback(
@@ -91,7 +89,11 @@ export const GameBackground = ({ width, height }: Size) => {
       }
 
       explosionsRef.current.push(particles);
-      setExplodedCometIds((prev) => new Set([...prev, comet.id || 0]));
+      setExplodedCometIds((prev) => {
+        const next = new Set(prev);
+        next.add(comet.id || 0);
+        return next;
+      });
       forceUpdate({});
 
       return particles;

@@ -1,6 +1,5 @@
-import { useEffect, useState, useMemo, useCallback, memo } from "react";
+import { useEffect, useState, useCallback, memo } from "react";
 
-// Sparkle indices array outside component to prevent recreation
 const SPARKLE_INDICES = Array.from({ length: 20 }, (_, i) => i);
 
 export const KonamiEffect = memo(() => {
@@ -20,97 +19,62 @@ export const KonamiEffect = memo(() => {
       );
   }, [handleKonamiCode]);
 
-  // Memoize sparkle style calculation
-  const getSparkleStyle = useCallback(
-    (i: number): React.CSSProperties => ({
-      "--delay": `${i * 0.1}s`,
-      "--angle": `${i * 18}deg`,
-      left: "50%",
-      top: "50%",
-    }),
-    []
-  );
-
   if (!showEffect) return null;
 
   return (
     <>
-      <div className="konami-overlay">
-        <div className="konami-message">
-          <div className="konami-title">KONAMI CODE ACTIVATED!</div>
-          <div className="konami-amount">+$1,000,000</div>
-          <div className="konami-sparkles">
+      <div className="fixed inset-0 z-[10001] flex items-center justify-center pointer-events-none">
+        <div className="text-center relative">
+          {/* Title */}
+          <div
+            className="font-poppins text-5xl font-black mb-5 animate-[titlePulse_0.8s_ease-in-out_infinite]"
+            style={{
+              color: "#FFD700",
+              textShadow:
+                "0 0 10px #FFD700, 0 0 20px #FFD700, 0 0 30px #FFA500, 0 0 40px #FFA500, 0 0 50px #FF6347",
+            }}
+          >
+            KONAMI CODE ACTIVATED!
+          </div>
+
+          {/* Amount */}
+          <div
+            className="font-poppins text-7xl font-black bg-clip-text text-transparent animate-[rainbowFlow_2s_ease-in-out_infinite,amountPop_0.6s_ease-out]"
+            style={{
+              background:
+                "linear-gradient(45deg, #FFD700, #FFA500, #FF6347, #FFD700)",
+              backgroundSize: "300% 300%",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+              filter: "drop-shadow(0 0 20px rgba(255, 215, 0, 0.8))",
+            }}
+          >
+            +$1,000,000
+          </div>
+
+          {/* Sparkles */}
+          <div className="absolute inset-0 w-full h-full">
             {SPARKLE_INDICES.map((i) => (
               <div
                 key={i}
-                className="sparkle"
-                style={getSparkleStyle(i) as React.CSSProperties}
+                className="absolute w-2 h-2 bg-yellow-400 rounded-full shadow-[0_0_10px_#FFD700,0_0_20px_#FFA500] animate-[sparkleFly_2s_ease-out_forwards]"
+                style={
+                  {
+                    left: "50%",
+                    top: "50%",
+                    animationDelay: `${i * 0.1}s`,
+                    "--angle": `${i * 18}deg`,
+                  } as React.CSSProperties
+                }
               />
             ))}
           </div>
         </div>
       </div>
+
+      {/* Custom animations */}
       <style>{`
-        .konami-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          pointer-events: none;
-          z-index: 10001;
-        }
-        .konami-message {
-          text-align: center;
-          position: relative;
-        }
-        .konami-title {
-          font-family: 'Poppins', sans-serif;
-          font-size: 48px;
-          font-weight: 900;
-          color: #FFD700;
-          text-shadow: 
-            0 0 10px #FFD700,
-            0 0 20px #FFD700,
-            0 0 30px #FFA500,
-            0 0 40px #FFA500,
-            0 0 50px #FF6347;
-          animation: titlePulse 0.8s ease-in-out infinite;
-          margin-bottom: 20px;
-        }
-        .konami-amount {
-          font-family: 'Poppins', sans-serif;
-          font-size: 72px;
-          font-weight: 900;
-          background: linear-gradient(45deg, #FFD700, #FFA500, #FF6347, #FFD700);
-          background-size: 300% 300%;
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          animation: rainbowFlow 2s ease-in-out infinite, amountPop 0.6s ease-out;
-          filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
-        }
-        .konami-sparkles {
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          top: 0;
-          left: 0;
-        }
-        .sparkle {
-          position: absolute;
-          width: 8px;
-          height: 8px;
-          background: #FFD700;
-          border-radius: 50%;
-          box-shadow: 
-            0 0 10px #FFD700,
-            0 0 20px #FFA500;
-          animation: sparkleFly 2s ease-out forwards;
-        }
         @keyframes titlePulse {
           0%, 100% { 
             transform: scale(1);

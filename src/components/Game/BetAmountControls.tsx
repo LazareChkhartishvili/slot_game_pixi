@@ -1,11 +1,11 @@
 import { Container, Graphics, Text } from "@pixi/react";
 import { TextStyle, Graphics as GraphicsType } from "pixi.js";
+
 import { useCallback, useMemo } from "react";
 import { formatCurrency } from "../../helper/formatCurrency";
 import { GAME_CONFIG } from "../../constants/game";
 import type { BetControlsProps } from "../../types";
 
-// Static styles - created once
 const LABEL_STYLE = new TextStyle({
   fill: 0xa0a3ff,
   fontSize: 14,
@@ -32,7 +32,6 @@ export const BetAmountControls = ({
   const panelHeight = 90;
   const panelRadius = 18;
 
-  /** --- Main background panel --- */
   const drawBackground = useCallback((g: GraphicsType) => {
     g.clear();
 
@@ -51,7 +50,6 @@ export const BetAmountControls = ({
     g.endFill();
   }, []);
 
-  /** --- Button look --- */
   const drawButton = useCallback(
     (g: GraphicsType, isButtonDisabled: boolean) => {
       g.clear();
@@ -65,7 +63,6 @@ export const BetAmountControls = ({
     [disabled]
   );
 
-  /** --- Logic --- */
   const getBetStep = useCallback((currentBet: number): number => {
     if (currentBet < 2.0) {
       return 0.2; // Step by $0.20 until $2.00
@@ -98,7 +95,6 @@ export const BetAmountControls = ({
     }
   }, [betAmount, onChangeBet, disabled, getBetStep]);
 
-  // Memoize symbol styles for each state
   const symbolStyleEnabled = useMemo(
     () =>
       new TextStyle({
@@ -130,7 +126,6 @@ export const BetAmountControls = ({
   const leftX = -panelWidth / 2 + 24;
   const buttonSpacing = 50;
 
-  // Check if buttons should be disabled
   const isDecreaseDisabled = betAmount <= GAME_CONFIG.INITIAL_STATE.MIN_BET;
   const isIncreaseDisabled = betAmount >= GAME_CONFIG.INITIAL_STATE.MAX_BET;
 

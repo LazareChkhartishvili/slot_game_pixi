@@ -1,6 +1,11 @@
 import { Container, Graphics, Sprite } from "@pixi/react";
 import { useCallback, useEffect, useState, memo } from "react";
 import { Assets, Graphics as GraphicsType } from "pixi.js";
+import {
+  BUTTON_COLORS,
+  BUTTON_DIMENSIONS,
+  OPACITY,
+} from "../../constants/theme";
 
 interface ToggleIconButtonProps {
   x: number;
@@ -12,111 +17,115 @@ interface ToggleIconButtonProps {
   inactiveIconPath: string;
 }
 
-export const ToggleIconButton = memo(({
-  x,
-  y,
-  isActive,
-  onClick,
-  disabled = false,
-  activeIconPath,
-  inactiveIconPath,
-}: ToggleIconButtonProps) => {
-  const [activeLoaded, setActiveLoaded] = useState(false);
-  const [inactiveLoaded, setInactiveLoaded] = useState(false);
+export const ToggleIconButton = memo(
+  ({
+    x,
+    y,
+    isActive,
+    onClick,
+    disabled = false,
+    activeIconPath,
+    inactiveIconPath,
+  }: ToggleIconButtonProps) => {
+    const [activeLoaded, setActiveLoaded] = useState(false);
+    const [inactiveLoaded, setInactiveLoaded] = useState(false);
 
-  // Load icons
-  useEffect(() => {
-    const loadIcons = async () => {
-      try {
-        await Assets.load(activeIconPath);
-        setActiveLoaded(true);
-        await Assets.load(inactiveIconPath);
-        setInactiveLoaded(true);
-      } catch (error) {
-        console.error("Failed to load toggle button icons:", error);
-      }
-    };
-    loadIcons();
-  }, [activeIconPath, inactiveIconPath]);
+    useEffect(() => {
+      const loadIcons = async () => {
+        try {
+          await Assets.load(activeIconPath);
+          setActiveLoaded(true);
+          await Assets.load(inactiveIconPath);
+          setInactiveLoaded(true);
+        } catch (error) {
+          console.error("Failed to load toggle button icons:", error);
+        }
+      };
+      loadIcons();
+    }, [activeIconPath, inactiveIconPath]);
 
-  const drawButton = useCallback(
-    (g: GraphicsType) => {
-      g.clear();
+    // Select colors based on active state
+    const colors = isActive
+      ? BUTTON_COLORS.toggleActive
+      : BUTTON_COLORS.toggleInactive;
 
-      const width = 70;
-      const height = 65;
-      const cornerRadius = 14;
+    const drawButton = useCallback(
+      (g: GraphicsType) => {
+        g.clear();
 
-      const baseColor = isActive ? 0x991b1b : 0x1e40af;
-      const shadowColor = isActive ? 0x7f1d1d : 0x1e3a8a;
+        const { width, height, cornerRadius, shadowOffset, overlayPadding } =
+          BUTTON_DIMENSIONS.toggle;
 
-      g.beginFill(shadowColor);
-      g.drawRoundedRect(
-        -width / 2,
-        -height / 2 + 6,
-        width,
-        height,
-        cornerRadius
-      );
-      g.endFill();
+        // Shadow
+        g.beginFill(colors.shadow);
+        g.drawRoundedRect(
+          -width / 2,
+          -height / 2 + shadowOffset,
+          width,
+          height,
+          cornerRadius
+        );
+        g.endFill();
 
-      g.beginFill(baseColor);
-      g.drawRoundedRect(
-        -width / 2,
-        -height / 2,
-        width,
-        height - 6,
-        cornerRadius
-      );
-      g.endFill();
+        // Base button
+        g.beginFill(colors.base);
+        g.drawRoundedRect(
+          -width / 2,
+          -height / 2,
+          width,
+          height - shadowOffset,
+          cornerRadius
+        );
+        g.endFill();
 
-      g.beginFill(0x000000, 0.1);
-      g.drawRoundedRect(
-        -width / 2 + 5,
-        -height / 2 + 5,
-        width - 10,
-        height - 14,
-        cornerRadius - 5
-      );
-      g.endFill();
-    },
-    [isActive]
-  );
+        // Inner overlay
+        g.beginFill(BUTTON_COLORS.overlay, OPACITY.overlay);
+        g.drawRoundedRect(
+          -width / 2 + overlayPadding,
+          -height / 2 + overlayPadding,
+          width - overlayPadding * 2,
+          height - shadowOffset - overlayPadding * 2,
+          cornerRadius - overlayPadding
+        );
+        g.endFill();
+      },
+      [colors]
+    );
 
-  const handleClick = useCallback(
-    (e: { stopPropagation: () => void }) => {
-      if (!disabled) {
-        e.stopPropagation();
-        onClick();
-      }
-    },
-    [disabled, onClick]
-  );
+    const handleClick = useCallback(
+      (e: { stopPropagation: () => void }) => {
+        if (!disabled) {
+          e.stopPropagation();
+          onClick();
+        }
+      },
+      [disabled, onClick]
+    );
 
-  const activeTexture = activeLoaded ? Assets.get(activeIconPath) : null;
-  const inactiveTexture = inactiveLoaded
-    ? Assets.get(inactiveIconPath)
-    : null;
-  const currentTexture = isActive ? activeTexture : inactiveTexture;
+    const activeTexture = activeLoaded ? Assets.get(activeIconPath) : null;
+    const inactiveTexture = inactiveLoaded
+      ? Assets.get(inactiveIconPath)
+      : null;
+    const currentTexture = isActive ? activeTexture : inactiveTexture;
 
-  return (
-    <Container
-      position={[x, y]}
-      eventMode={disabled ? "none" : "static"}
-      cursor={disabled ? "default" : "pointer"}
-      pointerdown={handleClick}
-      alpha={disabled ? 0.6 : 1}
-    >
-      <Graphics draw={drawButton} />
-      {currentTexture && (
-        <Sprite
-          texture={currentTexture}
-          anchor={[0.5, 0.5]}
-          width={30}
-          height={30}
-        />
-      )}
-    </Container>
-  );
-});
-
+    return (
+      <Container
+        position={[x, y]}
+        eventMode={disabled ? "none" : "static"}
+        cursor={disabled ? "default" : "pointer"}
+        pointerdown={handleClick}
+        alpha={disabled ? OPACITY.disabled : 1}
+      >
+        <Graphics draw={drawButton} />
+        {currentTexture && (
+          <Sprite
+            texture={currentTexture}
+            anchor={[0.5, 0.5]}
+            width={BUTTON_DIMENSIONS.toggle.iconSize}
+            height={BUTTON_DIMENSIONS.toggle.iconSize}
+          />
+        )}
+      </Container>
+    );
+  }
+);

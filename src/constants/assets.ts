@@ -1,7 +1,3 @@
-/**
- * Asset paths configuration
- */
-
 export const SYMBOL_ASSETS = [
   "images/symbols/a.png",
   "images/symbols/alien.png",
@@ -31,6 +27,5 @@ export const BG_ASSETS = SYMBOL_ASSETS.map((path) => {
     throw new Error(`Invalid filename: ${filename}`);
   }
 
-  // Create the background path
   return `images/symbol_bgs/${nameWithoutExt}_bg.png`;
 }) as readonly string[];

@@ -1,13 +1,5 @@
 import { useEffect, useState, useCallback, memo } from "react";
-
-const KEYBOARD_SHORTCUTS = [
-  ["SPACE", "Spin / Play"],
-  ["S", "Open Settings"],
-  ["M", "Toggle Music"],
-  ["F", "Toggle Fast Speed"],
-  ["A", "Toggle Auto Spin"],
-  ["← / →", "Decrease / Increase Bet"],
-] as const;
+import { KEYBOARD_SHORTCUTS } from "../../constants/keyboard";
 
 export const SettingsOverlay = memo(() => {
   const [open, setOpen] = useState(false);
@@ -59,7 +51,6 @@ export const SettingsOverlay = memo(() => {
             ✕
           </button>
 
-          {/* subtle moving light */}
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-400/10 to-transparent animate-[scan_6s_linear_infinite] mix-blend-screen opacity-20" />
         </div>
 

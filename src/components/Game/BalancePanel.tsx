@@ -4,7 +4,6 @@ import { TextStyle } from "pixi.js";
 import type { BalanceDisplayProps } from "../../types";
 import { formatCurrency } from "../../helper/formatCurrency";
 
-// Memoize styles outside component to prevent recreation
 const LABEL_STYLE = new TextStyle({
   fill: 0xffffff,
   fontSize: 16,
@@ -33,7 +32,6 @@ export const BalancePanel = ({
   balance,
   lastWin,
 }: BalanceDisplayProps) => {
-
   return (
     <Container position={[x, y]}>
       <Text text="BALANCE" anchor={[0, 0]} style={LABEL_STYLE} alpha={0.7} />
