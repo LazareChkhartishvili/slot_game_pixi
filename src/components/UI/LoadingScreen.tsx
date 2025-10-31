@@ -14,26 +14,35 @@ export const LoadingScreen = ({
   loaded,
 }: LoadingScreenProps) => {
   return (
-    <div className="fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-gradient-to-b from-[#0a0a1a] to-[#1a0a2a]">
-      {/* Logo or Title */}
+    <div className="fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-gradient-to-b from-[#0a0a1a] via-[#1a0a2a] to-[#0a0a1a]">
+      {/* Logo */}
       <div className="mb-8">
-        <h1 className="font-poppins text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-400 animate-pulse">
-          SLOT GAME
+        <img
+          src="/images/logo.png"
+          alt="Slot Game Logo"
+          className="w-56 h-auto animate-pulse"
+        />
+      </div>
+
+      {/* Loading Title */}
+      <div className="mb-6">
+        <h1 className="font-poppins text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-300 to-purple-400">
+          LOADING
         </h1>
       </div>
 
       {/* Progress Bar */}
-      <div className="w-80 mb-4">
-        <div className="h-4 bg-gray-800 rounded-full overflow-hidden border-2 border-gray-700">
+      <div className="w-96 mb-4">
+        <div className="h-3 bg-gray-900 rounded-full overflow-hidden border-2 border-purple-500/40 shadow-lg shadow-purple-500/20">
           <div
-            className="h-full bg-gradient-to-r from-yellow-500 to-yellow-300 transition-all duration-300 ease-out"
+            className="h-full bg-gradient-to-r from-purple-600 via-pink-500 to-purple-600 transition-all duration-300 ease-out"
             style={{ width: `${progress}%` }}
           />
         </div>
       </div>
 
       {/* Progress Text */}
-      <div className="text-gray-400 font-poppins text-sm">
+      <div className="text-purple-300 font-poppins text-sm mb-8">
         {total && loaded !== undefined ? (
           <span>
             Loading assets... {loaded}/{total} ({progress}%)
@@ -44,8 +53,8 @@ export const LoadingScreen = ({
       </div>
 
       {/* Spinning icon */}
-      <div className="mt-8">
-        <div className="w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin" />
+      <div className="mt-4">
+        <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
       </div>
     </div>
   );
