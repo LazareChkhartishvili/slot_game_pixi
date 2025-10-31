@@ -11,19 +11,10 @@ export const LoadingScreen = ({
 }: LoadingScreenProps) => {
   return (
     <div className="fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-gradient-to-b from-[#0a0a1a] via-[#1a0a2a] to-[#0a0a1a]">
-      {/* Logo */}
-      <div className="mb-8">
-        <img
-          src="/images/logo.png"
-          alt="Slot Game Logo"
-          className="w-56 h-auto animate-pulse"
-        />
-      </div>
-
       {/* Loading Title */}
-      <div className="mb-6">
-        <h1 className="font-poppins text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-300 to-purple-400">
-          LOADING
+      <div className="mb-8">
+        <h1 className="font-poppins text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-300 to-purple-400">
+          SLOT GAME
         </h1>
       </div>
 

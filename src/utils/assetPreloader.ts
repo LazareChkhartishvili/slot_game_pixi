@@ -51,11 +51,19 @@ export const preloadGameAssets = async (
     // Load all assets in parallel with progress tracking
     await Assets.loadBundle("game", (progress) => {
       loaded = Math.floor(progress * total);
+      const percentage = Math.min(Math.round(progress * 100), 100);
       onProgress?.({
         loaded,
         total,
-        percentage: Math.floor(progress * 100),
+        percentage,
       });
+    });
+
+    // Ensure 100% is shown at the end
+    onProgress?.({
+      loaded: total,
+      total,
+      percentage: 100,
     });
 
     console.log(`✅ Loaded ${total} assets successfully`);
