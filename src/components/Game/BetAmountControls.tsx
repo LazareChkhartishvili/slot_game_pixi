@@ -37,12 +37,12 @@ export const BetAmountControls = ({
 
   /** --- Button look --- */
   const drawButton = useCallback(
-    (g: GraphicsType) => {
+    (g: GraphicsType, isButtonDisabled: boolean) => {
       g.clear();
       const size = 48;
       const radius = 16;
-      const bg = disabled ? 0x2b2d58 : "#242253";
-      g.beginFill(bg, 0.9);
+      const bg = disabled || isButtonDisabled ? 0x1a1a2e : "#242253";
+      g.beginFill(bg, disabled || isButtonDisabled ? 0.5 : 0.9);
       g.drawRoundedRect(-size / 2, -size / 2, size, size, radius);
       g.endFill();
     },
@@ -97,15 +97,20 @@ export const BetAmountControls = ({
     fontFamily: "Poppins, sans-serif",
   });
 
-  const symbolStyle = new TextStyle({
-    fill: "7471c4",
-    fontSize: 26,
-    fontWeight: "700",
-    fontFamily: "Poppins, sans-serif",
-  });
+  const getSymbolStyle = (isButtonDisabled: boolean) =>
+    new TextStyle({
+      fill: disabled || isButtonDisabled ? 0x3a3a4e : "7471c4",
+      fontSize: 26,
+      fontWeight: "700",
+      fontFamily: "Poppins, sans-serif",
+    });
 
   const leftX = -panelWidth / 2 + 24;
   const buttonSpacing = 50;
+
+  // Check if buttons should be disabled
+  const isDecreaseDisabled = betAmount <= GAME_CONFIG.INITIAL_STATE.MIN_BET;
+  const isIncreaseDisabled = betAmount >= GAME_CONFIG.INITIAL_STATE.MAX_BET;
 
   return (
     <Container position={[x, y]}>
@@ -130,22 +135,30 @@ export const BetAmountControls = ({
       <Container position={[panelWidth / 2 - 80, 0]}>
         <Container
           position={[-buttonSpacing / 2 - 5, 0]}
-          eventMode={disabled ? "none" : "static"}
-          cursor="pointer"
+          eventMode={disabled || isDecreaseDisabled ? "none" : "static"}
+          cursor={disabled || isDecreaseDisabled ? "default" : "pointer"}
           pointerdown={handleDecreaseBet}
         >
-          <Graphics draw={drawButton} />
-          <Text text="−" anchor={[0.5, 0.5]} style={symbolStyle} />
+          <Graphics draw={(g) => drawButton(g, isDecreaseDisabled)} />
+          <Text
+            text="−"
+            anchor={[0.5, 0.5]}
+            style={getSymbolStyle(isDecreaseDisabled)}
+          />
         </Container>
 
         <Container
           position={[buttonSpacing / 2 + 5, 0]}
-          eventMode={disabled ? "none" : "static"}
-          cursor="pointer"
+          eventMode={disabled || isIncreaseDisabled ? "none" : "static"}
+          cursor={disabled || isIncreaseDisabled ? "default" : "pointer"}
           pointerdown={handleIncreaseBet}
         >
-          <Graphics draw={drawButton} />
-          <Text text="+" anchor={[0.5, 0.5]} style={symbolStyle} />
+          <Graphics draw={(g) => drawButton(g, isIncreaseDisabled)} />
+          <Text
+            text="+"
+            anchor={[0.5, 0.5]}
+            style={getSymbolStyle(isIncreaseDisabled)}
+          />
         </Container>
       </Container>
     </Container>

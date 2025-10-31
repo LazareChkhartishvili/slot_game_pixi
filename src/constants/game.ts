@@ -24,7 +24,7 @@ export const GAME_CONFIG = {
   // Initial game state
   INITIAL_STATE: {
     BALANCE: 1000,
-    BET_AMOUNT: 0.2,
+    BET_AMOUNT: 1.0,
     MIN_BET: 0.2,
     MAX_BET: 100.0,
     BET_STEP: 0.2,

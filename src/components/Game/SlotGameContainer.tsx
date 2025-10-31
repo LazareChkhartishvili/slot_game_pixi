@@ -211,17 +211,8 @@ export const SlotGameContainer = ({ width, height }: Size) => {
   }, [isMusicPlaying]);
 
   const handleToggleAutoSpin = useCallback(() => {
-    setIsAutoSpinning((prev) => {
-      const newState = !prev;
-      if (newState && !uiDisabled && gameState.balance >= gameState.betAmount) {
-        isAutoSpinningRef.current = true;
-        setTimeout(() => handleSpin(), 500);
-      } else {
-        isAutoSpinningRef.current = false;
-      }
-      return newState;
-    });
-  }, [uiDisabled, gameState.balance, gameState.betAmount, handleSpin]);
+    setIsAutoSpinning((prev) => !prev);
+  }, []);
 
   const handleToggleFastMode = useCallback(() => {
     // Prevent toggling fast mode while reels are spinning or UI is locked
@@ -324,16 +315,12 @@ export const SlotGameContainer = ({ width, height }: Size) => {
         y={layout.autoSpinButtonY}
         isActive={isAutoSpinning}
         onClick={handleToggleAutoSpin}
-        disabled={uiDisabled || gameState.balance < gameState.betAmount}
+        disabled={false}
       />
 
       <SpinActionButton
         handleSpin={handleSpin}
-        disabled={
-          uiDisabled ||
-          gameState.balance < gameState.betAmount ||
-          isAutoSpinning
-        }
+        disabled={uiDisabled || gameState.balance < gameState.betAmount}
         isSpinning={uiDisabled}
         x={layout.spinButtonX}
         y={layout.spinButtonY}
