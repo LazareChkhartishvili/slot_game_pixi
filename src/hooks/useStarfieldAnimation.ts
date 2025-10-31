@@ -53,7 +53,7 @@ export const useStarfieldAnimation = ({
 
   // Animate stars and comets via shared loop - 60 FPS for smooth animation
   useEffect(() => {
-    const unsubscribe = AnimationLoop.subscribe((dt) => {
+    const unsubscribe = AnimationLoop.subscribe(() => {
       // Update stars every frame (60 FPS) for smooth animation
       setStars((prevStars) =>
         prevStars.map((star) => {

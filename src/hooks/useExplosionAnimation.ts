@@ -11,7 +11,7 @@ export const useExplosionAnimation = () => {
     const targetFPS = 60;
     const frameTime = 1000 / targetFPS; // ~16.67ms per frame
 
-    const unsubscribe = AnimationLoop.subscribe((dt, time) => {
+    const unsubscribe = AnimationLoop.subscribe((dt) => {
       if (explosionsRef.current.length === 0) return;
 
       accumulator += dt;
