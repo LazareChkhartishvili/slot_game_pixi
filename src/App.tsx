@@ -1,14 +1,27 @@
 import { Stage } from "@pixi/react";
 import { useStageDimensions } from "./hooks/useStageDimensions";
+import { useKonamiHandler } from "./hooks/useKonamiHandler";
+import { useAssetPreloader } from "./hooks/useAssetPreloader";
 import { GameBackground } from "./components/UI";
 import { SlotGameContainer } from "./components/Game/SlotGameContainer";
 import { KonamiEffect } from "./components/UI/KonamiEffect";
 import { SettingsOverlay } from "./components/UI/SettingsOverlay";
-import { useKonamiHandler } from "./hooks/useKonamiHandler";
+import { LoadingScreen } from "./components/UI/LoadingScreen";
 
 const App = () => {
   const dimensions = useStageDimensions();
   useKonamiHandler();
+  const { isLoading, loadProgress } = useAssetPreloader();
+
+  if (isLoading) {
+    return (
+      <LoadingScreen
+        progress={loadProgress.percentage}
+        total={loadProgress.total}
+        loaded={loadProgress.loaded}
+      />
+    );
+  }
   return (
     <>
       <Stage

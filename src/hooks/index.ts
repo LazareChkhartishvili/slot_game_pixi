@@ -8,3 +8,4 @@ export { useBalanceAnimation } from "./useBalanceAnimation";
 export { useBorderAnimation } from "./useBorderAnimation";
 export { useSymbolBackgroundAnimation } from "./useSymbolBackgroundAnimation";
 export { useGlowAnimation } from "./useGlowAnimation";
+export { useAssetPreloader } from "./useAssetPreloader";
