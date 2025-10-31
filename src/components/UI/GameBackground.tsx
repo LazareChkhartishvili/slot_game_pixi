@@ -4,14 +4,12 @@ import { useCallback, useEffect, useState } from "react";
 import type { Size, Star, ExplosionParticle } from "../../types";
 
 import { createGradientTexture } from "../../helper/textureUtils";
+import { GAME_CONFIG } from "../../constants/game";
 
 import { useExplosionAnimation } from "../../hooks/useExplosionAnimation";
 import { useStarfieldAnimation } from "../../hooks/useStarfieldAnimation";
 import { CometSprite } from "./CometSprite";
 import { ExplosionEffect } from "./ExplosionEffect";
-
-const EXPLOSION_COLORS = [0xffaa00, 0xff6600, 0xff0000, 0xffff00];
-const PARTICLE_COUNT = 30;
 
 export const GameBackground = ({ width, height }: Size) => {
   const [bgTexture, setBgTexture] = useState<Texture>(Texture.EMPTY);
@@ -71,8 +69,8 @@ export const GameBackground = ({ width, height }: Size) => {
     (comet: Star): ExplosionParticle[] => {
       const particles: ExplosionParticle[] = [];
 
-      for (let i = 0; i < PARTICLE_COUNT; i++) {
-        const angle = (Math.PI * 2 * i) / PARTICLE_COUNT;
+      for (let i = 0; i < GAME_CONFIG.EFFECTS.PARTICLE_COUNT; i++) {
+        const angle = (Math.PI * 2 * i) / GAME_CONFIG.EFFECTS.PARTICLE_COUNT;
         const speed = Math.random() * 3 + 2;
         particles.push({
           x: comet.x,
@@ -82,8 +80,10 @@ export const GameBackground = ({ width, height }: Size) => {
           life: 1.0,
           size: Math.random() * 6 + 4,
           color:
-            EXPLOSION_COLORS[
-              Math.floor(Math.random() * EXPLOSION_COLORS.length)
+            GAME_CONFIG.EFFECTS.EXPLOSION_COLORS[
+              Math.floor(
+                Math.random() * GAME_CONFIG.EFFECTS.EXPLOSION_COLORS.length
+              )
             ] || 0xff6600,
         });
       }

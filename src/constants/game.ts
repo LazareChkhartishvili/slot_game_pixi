@@ -44,6 +44,12 @@ export const GAME_CONFIG = {
       [100, 250, 500],
     ],
   },
+
+  // Visual effects
+  EFFECTS: {
+    EXPLOSION_COLORS: [0xffaa00, 0xff6600, 0xff0000, 0xffff00],
+    PARTICLE_COUNT: 30,
+  },
 } as const;
 
 export type GameConfig = typeof GAME_CONFIG;
