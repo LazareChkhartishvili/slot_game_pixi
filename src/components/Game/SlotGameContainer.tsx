@@ -201,13 +201,24 @@ export const SlotGameContainer = ({ width, height }: Size) => {
   }, []);
 
   const handleToggleAutoSpin = useCallback(() => {
-    setIsAutoSpinning((prev) => !prev);
-  }, []);
+    setIsAutoSpinning((prev) => {
+      const newValue = !prev;
+      
+      // თუ auto-spin ჩაირთო და არ ტრიალებს, დაიწყე spin
+      if (newValue && !gameState.isSpinning && !uiDisabled) {
+        // დაელოდოს state update-ს და დაიწყოს spin
+        setTimeout(() => {
+          handleSpin();
+        }, 0);
+      }
+      
+      return newValue;
+    });
+  }, [gameState.isSpinning, uiDisabled, handleSpin]);
 
   const handleToggleFastMode = useCallback(() => {
-    if (uiDisabled || gameState.isSpinning) return;
     setIsFastMode((prev) => !prev);
-  }, [uiDisabled, gameState.isSpinning]);
+  }, []);
 
   useKeyboardControls({
     onSpin: handleSpin,
@@ -291,7 +302,7 @@ export const SlotGameContainer = ({ width, height }: Size) => {
         y={layout.betControlsY}
         betAmount={gameState.betAmount}
         onChangeBet={handleBetChange}
-        disabled={uiDisabled}
+        disabled={uiDisabled || isAutoSpinning}
       />
 
       <FastSpeedButton
@@ -299,7 +310,7 @@ export const SlotGameContainer = ({ width, height }: Size) => {
         y={layout.fastSpeedButtonY}
         isActive={isFastMode}
         onClick={handleToggleFastMode}
-        disabled={uiDisabled || gameState.balance < gameState.betAmount}
+        disabled={isAutoSpinning}
       />
 
       <AutoSpinButton
@@ -312,8 +323,8 @@ export const SlotGameContainer = ({ width, height }: Size) => {
 
       <SpinActionButton
         handleSpin={handleSpin}
-        disabled={uiDisabled || gameState.balance < gameState.betAmount}
-        isSpinning={uiDisabled}
+        disabled={uiDisabled || isAutoSpinning || gameState.balance < gameState.betAmount}
+        isSpinning={uiDisabled || isAutoSpinning}
         x={layout.spinButtonX}
         y={layout.spinButtonY}
       />

@@ -1,7 +1,3 @@
-/**
- * Custom hook for preloading game assets
- */
-
 import { useState, useEffect } from "react";
 import { preloadGameAssets, type PreloadProgress } from "../utils/assetPreloader";
 
@@ -20,12 +16,10 @@ export const useAssetPreloader = () => {
           setLoadProgress(progress);
         });
         
-        // Wait a bit to show 100% before hiding loading screen
         await new Promise(resolve => setTimeout(resolve, 500));
         setIsLoading(false);
       } catch (error) {
         console.error("Failed to load assets:", error);
-        // Still allow game to start even if some assets fail
         setIsLoading(false);
       }
     };

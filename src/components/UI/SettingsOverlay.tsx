@@ -91,11 +91,10 @@ export const SettingsOverlay = memo(() => {
         </div>
       </div>
 
-      {/* Scan animation keyframe */}
       <style>{`
         @keyframes scan {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
+          from { transform: translateX(-100%); }
+          to { transform: translateX(100%); }
         }
       `}</style>
     </div>

@@ -73,7 +73,6 @@ export const KonamiEffect = memo(() => {
         </div>
       </div>
 
-      {/* Custom animations */}
       <style>{`
         @keyframes titlePulse {
           0%, 100% { 
