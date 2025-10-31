@@ -46,12 +46,12 @@ export const SettingsOverlay = memo(() => {
           </h2>
           <button
             onClick={handleClose}
-            className="w-9 h-9 rounded-lg bg-white/10 hover:bg-white/20 transition flex items-center justify-center text-xl"
+            className="w-9 h-9 rounded-lg bg-white/10 hover:bg-white/20 transition flex items-center justify-center text-xl cursor-pointer relative z-10"
           >
             ✕
           </button>
 
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-400/10 to-transparent animate-[scan_6s_linear_infinite] mix-blend-screen opacity-20" />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-400/10 to-transparent animate-[scan_6s_linear_infinite] mix-blend-screen opacity-20 pointer-events-none" />
         </div>
 
         {/* Content */}
